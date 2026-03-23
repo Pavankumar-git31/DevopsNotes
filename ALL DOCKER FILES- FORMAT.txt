@@ -1,0 +1,276 @@
+ALL DOCKER FILES :
+
+1.Static Website (HTML / CSS / JavaScript)
+
+FROM nginx:alpine
+
+COPY . /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+
+
+
+Used for:
+
+HTML websites
+
+landing pages
+
+static JS apps
+
+
+
+
+
+=====================================================
+
+
+
+
+
+
+2.React / Angular / Vue (Frontend Frameworks)
+
+FROM node:18 AS build
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+RUN npm run build
+
+FROM nginx:alpine
+
+COPY --from=build /app/build /usr/share/nginx/html
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+
+Used for:
+
+React
+
+Angular
+
+Vue
+
+
+==============================================
+
+
+
+
+3.Node.js Backend
+
+
+
+
+FROM node:18
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 3000
+
+CMD ["node", "server.js"]
+
+
+
+
+
+Used for:
+
+Express.js
+
+NestJS
+
+backend APIs
+
+
+
+
+
+
+
+
+4. Python Applications
+
+
+FROM python:3.10
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+
+EXPOSE 5000
+
+CMD ["python", "app.py"]
+
+
+
+
+Used for:
+
+Flask
+
+FastAPI
+
+Django
+
+
+
+
+
+
+
+
+
+
+5.Java Applications
+
+
+
+FROM openjdk:17
+
+WORKDIR /app
+
+COPY target/app.jar app.jar
+
+EXPOSE 8080
+
+CMD ["java", "-jar", "app.jar"]
+
+
+
+
+
+Used for:
+
+Spring Boot
+
+microservices
+
+
+
+
+
+
+
+
+6. Golang Applications
+
+
+FROM golang:1.20
+
+WORKDIR /app
+
+COPY . .
+
+RUN go build -o main
+
+EXPOSE 8080
+
+CMD ["./main"]
+
+
+
+
+
+Used for:
+
+Go microservices
+
+backend APIs
+
+
+
+
+
+
+
+
+
+7. PHP Applications
+
+
+
+
+FROM php:8.2-apache
+
+COPY . /var/www/html
+
+EXPOSE 80
+
+
+Used for:
+
+WordPress
+
+PHP websites
+
+
+
+
+
+
+
+
+8. Database Containers
+
+
+
+MySQL
+
+docker run -d -p 3306:3306 mysql:8
+
+Redis
+
+docker run -d -p 6379:6379 redis
+
+Postgres
+
+docker run -d -p 5432:5432 postgres
+
+
+
+
+
+
+STRUCTURE OF DOCKER FILE :
+
+1️⃣ FROM → base image
+2️⃣ WORKDIR → working directory
+3️⃣ COPY → copy application files
+4️⃣ RUN → install dependencies
+5️⃣ EXPOSE → application port
+6️⃣ CMD → start the application
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

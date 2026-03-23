@@ -1,0 +1,80 @@
+
+KOPS INSTALLATION 
+
+SCRIPT TO INSTALL THE KOPS AND CUBECTL
+
+# to install the KUBECTL
+
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+# to install the KOPS 
+
+curl -LO https://github.com/kubernetes/kops/releases/latest/download/kops-linux-amd64
+
+# GIVING THE PERMISSIONS
+
+chmod +x kops-linux-amd64 kubectl
+
+mv kops-linux-amd64 /usr/local/bin/kops
+
+mv kubectl /usr/local/bin/kubectl
+
+====================================================
+
+vim .bashrc
+
+export PATH=$PATH:/usr/local/bin/
+:wq
+
+source .bashrc
+
+
+
+SCRIPT TO CREATE THE BUCKET
+
+aws s3api create-bucket --bucket bucket_name --region us-east-1
+
+aws s3api put-bucket-versioning --bucket bucket_name --region us-east-1 versioning-configuration-Status=Enable 
+
+export KOPS_STATE_STORE:s3/bucket_name
+
+
+
+SCRIPT TO CREATE THE CLUSTER 
+
+kops create-cluster --name cluster_name --zone us-east-1 --master-count=1 master-size t2.medium --node-count=2 --node-size t2.micro
+
+kops update cluster cluster_name --yes --admin
+
+
+ADMIN LEVEL ACTIVITIES :
+
+kops get cluster 
+
+kops get no
+
+kops edit ig --name cluster_name node-regionname 
+
+kops rolling update cluster -y
+
+kops edit ig --name cluster_name master-regionname 
+
+kops rolling update -y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

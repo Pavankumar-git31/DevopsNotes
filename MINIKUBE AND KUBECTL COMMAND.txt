@@ -1,0 +1,35 @@
+MINIKUBE AND KUBECTL COMMAND
+
+sudo apt install curl wget apt-transport-https -y
+curl -fsSL https://get.docker.com -o get-docker.sh && sudo sh get-docker.sh
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+
+chmod +x /usr/local/bin/minikube
+minikube version
+
+
+KUBECTL :
+
+All commands for kubectl:
+# Step 1: Download latest stable kubectl
+curl -LO "https://dl.k8s.io/release/$(curl -Ls https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+# Step 2: Make kubectl executable
+chmod +x kubectl
+
+# Step 3: Move kubectl to system PATH
+sudo mv kubectl /usr/local/bin/kubectl
+
+# Step 4: Verify kubectl installation
+kubectl version --client
+
+
+minikube start --driver=docker --force
+
+
+
+
+
+
+

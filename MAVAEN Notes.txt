@@ -1,0 +1,56 @@
+MAVAEN :
+it is used to build the project .
+by default our project consist of .java file 
+when we compile .class file will be created 
+when we give the package .jar or .war files will be created . that files we need to use to deploy the application
+before deploying the source code in server we need to build the project for that building purpose we used this maven tool
+
+STEP BY STEP PROCESS:
+yum install git  maven , java -1.8.0-openjdk -y  --> it will install the maven ,git, java
+
+after that clone the repository you want to build.
+after that give ll to see the project is cloned or not 
+after that read the pom.xml to read the entire information about project.
+plugin:
+first when we give the commands to maven the required software is there it is check to local repo and done . if it is not there it is directly installed from internet.
+after that give the below commands:
+
+mvn compile  --> after compile . class file will be created 
+mvn test     --> build success
+mvn package  --> used to create the . jar file 
+give tree command we can see the .war file --> that artifact we need to put in home directory of maven .m2
+
+mvn install  --> war file is directly generate on .m2 folder 
+
+check in .m2 folder war is stored or not 
+cd / root/.m2/ repository/ -- you can see the path above after mvn install command
+cd- = we can go to previous folder 
+
+mvn clean package 
+the before all commands performed automatically --> real time directly we give this command
+mvn clean --> used to delete the target folder 
+give ll
+to see dont have the target folder 
+
+alternative for maven:
+
+maven    ---> ant 
+pom.xml  ---> build.xml
+life cycle  ---> no life cycle 
+procedural  ---> declarative
+pulgins	    ---> no plugins
+no scripts  ---> having script
+
+yum remove  maven* -y  : command used to uninstall the maven
+mvn -version    : to check the java version
+
+trouble shooting techniques :
+check java version
+check pom.xml is there or not 
+check the code 
+
+c,c++ -make file
+java - maven
+.net  - visual studio
+python  - gradel
+

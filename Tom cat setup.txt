@@ -1,0 +1,79 @@
+Tom cat setup:
+1.wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.115/bin/apache-tomcat-9.0.115.tar.gz
+
+when we run the command in slave server it is in tar format we need to un tar it 
+2.command : tar -zxvf apache-tomcat-9.0.115.tar.gz
+
+3.we need to create username and password to login :
+vim apache-tomcat-9.0.115/conf/tomcat-users.x
+ go to bottom line shift+g 
+copy the three lines and paste below .
+and modify the username :Manager-gui
+another username is : manager-script
+give password : Vikram@2156
+roles : manager-gui , manager-script
+
+4. vim apache-tomcat-9.0.115/webapps/manager/META-INF/context.xml
+delete 21 , 22 lines 
+
+5. start the tomcat : sh apache-tomcat-9.0.115/bin/startup.sh
+
+public_ip: 8080
+
+manager-app --> login with username and password 
+
+we need to attach tom cat to pipeline :
+1.dowmload the plugin --> manage Jenkins --> plugins --> available plugins--> deploy to container --> install: to deploy the tomcat 
+
+2.manage Jenkins --> credentials --> system --> global crediantals --> add credentials
+--> add the username and password (tomcat) --> save 
+
+manage Jenkins --> credentials --> see your added credentials --> copy the id 
+
+3. go to pipeline 
+
+ stage('deployment')
+        {
+            deploy adapters:[
+                tomcat9(
+                    credentialsId:,
+                    path:'',
+                    url:'tomcaturl'
+                    )
+                ],
+                contextPath : 'netflix'
+                war: 'target/*.war'
+        }
+
+
+
+if you want to see the live logs of the app
+cmd :tail -100f /root/apache-tomcat-9.0.115/logs/Catalina.2
+
+
+
+TROUBLE SHOOTING TECHNIQUES:
+1.SERVER LEVEL TROUBLE SHOOTING 
+2.JOB LEVEL TROUBLE SHOOTING 
+3. CODE LEVEL TROUBLE SHOOTING 
+
+1.SERVER LEVEL TROUBLE SHOOTING :
+1. see the console output 
+2.maven and java versions
+3. dependency mistakes 
+4. cpu and memory consumption
+
+2.JOB LEVEL TROUBLE SHOOTING :
+1.repository and branch name - main/master 
+2.syntax mistakes 
+3. plugins 
+
+
+
+How to change the tomcat port number :
+vim /root/apache-tomcat-9.0.115/conf/server.xml
+go to line no :69 : change the port number 
+
+restart : sh root/apache-tomcat-9.0.115/bin/shutdown.sh -->shutdown 
+start :sh root/apache-tomcat-9.0.115/bin/shutdown.sh --> start
+

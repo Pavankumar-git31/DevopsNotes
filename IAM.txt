@@ -1,0 +1,59 @@
+IAM :
+
+IDENTITY AND ACCESS MANAGEMENT :
+The main purpose of using IAM is to restrict the users.
+
+-> USERS 
+-> GROUPS 
+-> ROLES 
+
+AUTHENTICATION : WHO CAN SIGN IN
+
+AUTHORIZATION : PERMISSION TO WORK 
+
+
+-> USERS :
+
+when we create a particular user for that user we are going to give the user name and password and we are going to give the permissions based up on the permissions when ever he is trying to access the console he will get only some resources what ever the permissions i have given he can see the only that things.
+
+
+
+IAM --> users --> create users --> name --> check the box --> password auto generator --> check the box person can create a password in next sign in --> next --> permissions and policies we can give the permissions for the user (ex : ec2ReadonlyAccess) --> attach policies directly --> next --> create user --> download .csv file --> copy the console url 
+
+paste it on another browser --> username --> password 
+
+
+NOTE-1 : we will never give the administrator access to the user . because if you give the admin access the whole purpose of IAM is vanished . because the purpose of IAM is to restrict the user.
+
+NOTE -2 : we can create up to 5000 IAM users. for groups we can create 300 groups.
+     
+what is the difference between the username and password & access key and secret key
+
+username and password : if you want to work in console level you can use the username and password 
+
+access and secret key : if you want to work you can give that one.
+
+
+HOW TO GENERATE ACCESS KEY AND SECRET KEYS :
+
+users --> user --> security credentials --> create access key --> CLI --> next --> create access key --> download .csv file 
+
+
+for example if your friend stole your access key and secret key . now your friend can able to control the aws console or not in that case what we have to do.
+
+in that case for IAM user we can create up to 2 access keys . create another access key and deactivate the first access key.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

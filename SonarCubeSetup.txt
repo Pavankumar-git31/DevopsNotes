@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Run as root
+cd /opt
+
+# Install dependencies
+yum update -y
+yum install unzip wget -y
+yum install java-17-amazon-corretto -y
+
+# Verify Java
+java -version
+
+# Set kernel limits
+echo "vm.max_map_count=262144" >> /etc/sysctl.conf
+echo "fs.file-max=65536" >> /etc/sysctl.conf
+sysctl -p
+
+# Set user limits
+echo "sonar - nofile 65536" >> /etc/security/limits.conf
+echo "sonar - nproc 4096" >> /etc/security/limits.conf
+
+# Download SonarQube 9.9 LTS
+wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-9.9.3.79811.zip
+unzip sonarqube-9.9.3.79811.zip
+mv sonarqube-9.9.3.79811 sonarqube
+
+# Create sonar user
+useradd sonar
+chown -R sonar:sonar /opt/sonarqube
+
+# Start SonarQube
+su - sonar -c "/opt/sonarqube/bin/linux-x86-64/sonar.sh start"

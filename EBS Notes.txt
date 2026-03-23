@@ -1,0 +1,87 @@
+EBS:
+here it is a volume for storing the content and we will attach to the server.
+It is a root volume in which the OS will be run , it is also called as a boot volume.
+
+example :
+when we created a server we are getting Linux or windows or ubuntu . where the OS will be storing. the OS is storing in EBS nothing but root volume also called as boot volume.
+
+Root Volume : the volume which consist of OS is called the root volume.\
+
+
+BLOCK STORAGE TYPES:
+EBS :
+-> persistence: if you stop or reboot the server the data will not be deleted.
+-> if you terminate it will delete.
+-> N/W attached to virtual drive.
+-> N/W attached is slow than physical attached.
+-> maximum limitation is 16TB of storage.
+
+INSTANCE STORE BACKED EC2 :
+-> the virtual hard drive on the host is allocated to ec2 instances.
+-> it is limited to some instances.
+-> limited to 10GB per device.
+-> Non-persistence ( Ephermeral)
+-> can only be rebooted if you stop or terminate the data will be deleted.
+
+
+EBS :
+-> it's a raw Un-formatted , external block storage that you can attach to EC2 instances.
+-> EBS Attached to EC2 through the AWS network , like virtual hard drive.
+-> Multiple EBS volumes can be attached to single EC2 instance.
+-> at a time we can attach the single EBS volume to EC2 instance.
+-> EBS volumes and instances must be in same availability Zones.
+-> the Data in EBS volumes will be replicated in multiple copies in same AZ to prevent data      
+   data loss.
+
+VOLUME TYPES :
+1) SSD :
+-> gp2: general purpose 
+-> io1: Provisioned IOPS SSD
+
+2) HDD :
+-> st1 : Throughput Optimized HDD
+-> sc1 : Cold HDD
+-> standard : EBS Magnetic
+
+When we are going to use HDD or SSD :
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

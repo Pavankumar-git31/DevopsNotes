@@ -1,0 +1,21 @@
+Interview questions:
+
+TROUBLESHOOTING TECHNIQUES:
+how to remove the worker node from ansible main server :
+how to see how many worker nodes are connected to server : 
+1) cd .ssh
+2) cat known_hosts  -> you can see the all ip address of the nodes (or) ansible all --list-host
+
+ansible all --list-host --> it shows dummy ip address also not connected one
+cat known_hosts --> it will give the real ip address nodes which are connected 
+
+3) i want to check the worker node memory and cpu information 
+ansible all -m setup  : it will print all the information about the worker nodes   
+
+cpu information : ansible all -m setup | grep -i cpus
+memory information : ansible all -m setup | grep -i mem
+
+how ton increase the strength of ram and cpu for serever:
+stop the instance --> select --> actions --> instance settings --> change instance type --> Apply
+
+average computing capacity of the servers in real time is minimum 8 cpus required 

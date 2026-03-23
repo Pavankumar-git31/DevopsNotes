@@ -1,0 +1,714 @@
+
+MONOLITHIC :
+monolithic means if an application contains n number of services (let's take the Paytm has money transactions , movie tickets , train tickets etc..) if all these services are included in to one server then it will be called monolithic architecture. every monolithic architecture having one database for all the services 
+
+
+MICROSERVICES :
+if an application contains n number of services (let's take the Paytm application has movies , train tickets etc..) if every service having it own individual servers it is called the microservices.
+every microservice architecture has its own database for each service
+
+MICRO:
+cost is more 
+maintenance is more because we have to maintain the multiple servers(this is major drawback)
+individual databases (more efficient to read) 
+
+
+MONO:
+server performance will effect when more no of users.
+only single database. (less efficient) 
+
+NOTE:
+in order to overcome the draw back of the microservices. the containers comes in to the picture.
+
+cloud enters in market on 2007. before cloud how the application is going to maintain.
+in inside the building physical servers is there(on prem servers) in that servers application is running.
+but i has some limitations.
+
+ON-PREM:
+1. maintenance is more (electricity for continuous running )
+2. more space is needed.
+3. IT people must be available 24/7 because we don't know what will happen at any time.(too difficult to     maintain)
+4. Hardware issues 
+5. we cant host multiple applications in server.
+
+in order to overcome this limitations.
+in before 2000's there is comes in to picture virtualization.
+
+
+VIRTUALIZATION:
+VIRTUAL SERVER: the server which is running on main server.
+we are creating the virtual servers in the main server so it is better than the on-prem servers.
+Limitation:
+if i have 8 cpus and 8gb ram i can create max 8 severs ( scalability issues & fixed hardware ) to over come this issue.
+
+after 2000's cloud comes in to market:
+if we use cloud we dont need sapce to setup the server dont need to setup the hardware we can scale as much as possible. because everything is managed by the datacenter.so campared to on prem and virtualization cloud is very good option
+
+LIMITATIONS OF CLOUD:
+1. cost is more 
+if we use 10 servers per day each server each server cost is 100/hour 1000X24=24000
+so there is another concept called containers.
+i can pay the bill for one server in that server i can use the 10 servers with the help of the containers.
+i have to pay the bill for the severs. but for containers i dont need to pay the bill. even what ever we are doing in servers we can do with containers as well.
+
+CONTAINERS:
+in the main server if we create the 100 containers we can able to deploy the 100 services in that containers because the containers is nothing but servers.
+so that containers are going to consume our physical laptop or pc hardware like virtualization concept . but the containers consume less weighatage of hardware like (0.1 cpu and 100 mb of space ==~ 2cpu aand 2gb ram )
+
+Advantage of container:
+1. light weighted
+2. easy to manage (because in single server having the 100 containers)
+
+
+CONTAINERS:
+container = server
+
+container will not have default OS
+cant able to install the packages 
+cant able to deploy the app
+
+to overcome that we are using the images.
+images : inside the images we have OS and packages
+
+image (os) --> container(app)
+
+VIRTUALIZATION : process of utilizing hardware resources in better way
+CONTAINERISATION : process of packing application with its dependency
+in the initial version of the pubg when we install form the playstore and maps we have to install on the internet. 
+because maps is a dependency for the pubg.
+
+after next version of the pubg. the maps is in application it self nothing but packing the dependencies in side the application.
+so that is the exact meaning of the containerisation.
+ 
+if we want to provide the containerisation we have to create the containers. container is like virtual server in server we want to deploy application we want os and packages. so i need a tool called DOCKER.
+
+DOCKER :
+it is a free & open source platform 
+docker will create containers.
+we can create run and even deploy our apps in containers 
+it is platform independent
+but natively run on Linux distributions (more flexible)
+containers will use host resources (memory , cpu's ,ram , os)
+host is where we installed the docker ( eg : Linux , wondows , macos )
+docker will perform os level of virtualization called as containerisation.
+
+year : 2013
+developed by : solomen hykes and Sebastian phal
+language : go language (year : 2008)
+
+
+ARCHITECTURE : 
+
+DOCKER CLIENT : it is a way of interacting with docker ( command --> output )
+DOCKER DEAMON : it manages all the docker components ( image , containers , volumes , network )
+DOCKER HOST   : where we install the docker (windows , Linux ) it going to consume hardware of the server.
+DOCKER REGIS  : it manages all the docker images on internet. 
+
+INSTALLATION PROCESS : 
+dnf install docker -y  (by default daemon is not in working condition because we have to install the daemon
+because docker is a service so we have to start the service )
+systemctl start docker 
+systemctl status docker (client and docker engine (docker daemon) is going to run )
+
+if i want to create a container i want image :
+docker images --> (if the image is there in client or daemon we can use that one if not we have to ask registry )
+docker search amazonlinux --> asking to registry 
+if we want to pull that image from registry to client 
+docker pull amazonlinux --> now image is there 
+===================
+create a container: docker run -it --name cont1 amazonlinux --> here it means(interactive terminal)
+we are in the container :
+here we can perform all the actions like server
+
+cntr + p q			: to exit from comtainer
+
+docker attach cont1		: go inside the container
+
+docker ps			: you can see the running containers 
+
+docker ps -a			: you can see the all running and stopped containers 
+
+docker stop cont1		: to stop the container (but it will take at least 5 seconds)
+
+docker kill cont1		: to stop the container (but its not take the time )
+
+docker rm cont_id		: delete that container
+
+docker ps -a -q			: to list all ids of containers 
+
+docker rm $(docker ps -a -q)	: to delete the all containers
+
+docker stop $(docker ps -a -q)	: to stop the all containers
+
+docker images -q		:to get the ids of all images 
+
+docker rmi -f $(docker images -q) : to delete the all images forcefull
+
+because docker stop will stop the services inside the container so it waits for some time but docker kill will directly stop that container don't care about services the inside containers.
+
+
+OS LEVEL OF VIRTUALIZATION:
+NOTE : apt is package manager for ubuntu 
+REDHAT : dnf
+UBUNTU : apt
+
+WORKING:
+docker pull ubuntu 
+docker run -it --name cont1 ubuntu
+apt update -y  --> (it is a package manager ubuntu we can install packages in ubuntu the extension is Advance Package Tool)
+apt update -y (because installing the packages will not be installed in ubuntu )
+apt install git maven apache2 tree -y
+
+NOTE : here i want to create the custom image copy form the container that means what ever the packages files inside the container1 it is going to copy to the custom image 
+
+docker commit cont1 pavan    --> (image will be created by reference of the cont1)
+
+docker run -it --name cont2 pavan
+
+for creating one container like this is okay but if you want to create the 100 containers in real time we are not using this manual method
+so we are using the file called docker file used for image automation.
+
+DOCKER FILE : 
+it is used to creating images automatically.
+we can reuse the docker file multiple times.
+in Docker file 'D' is always capital.
+Components inside the docker files is also capital
+
+create Docker file --> image creation --> Container --> repeat
+
+COMPONENTS : 
+FROM		: ubuntu (gives the image)
+RUN		: run the Linux commands (image creation) 
+CMD		: run the Linux commands (container creation)
+ENTRYPOINT	: high priority than cmd
+COPY		: to copy local files to container
+ADD		: to copy the internet files to container
+WORKDIR		: to go to desired folder path
+LABEL		: tags and authors 
+ENV		: variables which run inside the containers (image)
+ARGS		: variables which run outside the container
+VOLUME		: used to create volume for the container 
+EXPOSE		: used to give port number 
+
+vim Dockerfile
+FROM ubuntu
+RUN apt update -y
+RUN apt install git maven apache2 -y
+CMD apt install default-jre -y
+
+docker build -t Netflix:v1 .
+docker run -it --name cont3 Netflix:v2
+Difference between RUN vs CMD
+RUN : it is command to perform while image creation
+CMD : it is command to perform after container creation from that image 
+
+Note: when you execute the cmd command your container going to stopped state 
+
+
+ex-2:
+
+vim Dockerfile
+FROM ubuntu
+RUN apt update -y
+RUN apt install git maven apache2 -y
+COPY index.html /tmp
+ADD  https://dlcdn.apache.org/maven/maven-4/4.0.0-rc-5/binaries/apache-maven-4.0.0-rc-5-bin.tar.gz /tmp
+
+Note : if i create a container by default it is in root path. if i want to go to direct required path default there is component called workdir
+
+ex-3:
+vim Dockerfile
+FROM ubuntu
+RUN apt update -y
+RUN apt install git maven apache2 -y
+COPY index.html /tmp
+ADD  https://dlcdn.apache.org/maven/maven-4/4.0.0-rc-5/binaries/apache-maven-4.0.0-rc-5-bin.tar.gz /tmp
+WORKDIR /tmp
+LABEL author pavankumar
+
+note : if you want entire container information
+docker inspect cont1
+if you want to see the label 
+docker inspect cont1 |grep -i author
+if you want image information 
+docker inspect Netflix:v1 
+
+ENV : 
+the variables which run inside the container
+
+ex-4
+vim Dockerfile
+FROM ubuntu
+RUN apt update -y
+RUN apt install git maven apache2 -y
+COPY index.html /tmp
+ADD  https://dlcdn.apache.org/maven/maven-4/4.0.0-rc-5/binaries/apache-maven-4.0.0-rc-5-bin.tar.gz /tmp
+WORKDIR /tmp
+LABEL author pavankumar
+ENV name pavan
+
+docker run -it --name cont4 Netflix:v2
+
+echo $name  --> it will return the name pavan (we have to run inside the container)
+
+
+VOLUMES :
+in docker we use volumes to store the data
+volume is nothing but a folder inside the container.
+the volume contains the files which have data.
+we can attach single volume to multiple containers.
+but at a time we can attach only one volume to one container.
+volumes are decoupled ( loosely attached ).
+if we delete the container volume will not be deleted.
+
+METHOD-1 :
+just create a docker file
+vim Dockerfile
+FROM ubuntu
+VOLUME ["/volume1"]
+docker build -t Netflix:v1
+docker run -it --name cont1 Netflix:v1
+cd volume1
+sudo apt update -y
+touch file{1..10}
+apt install vim -y
+vim file1 --> add some data 
+exit from container 
+currently my volume is inside the container.
+i want to share the volume from container1 to container2
+first create container 2
+docker run -it --name cont2 --volumes-from cont1 --privileged=true ubuntu
+cd volume1 
+ll
+
+==================================================
+
+2. CLI:
+docker run -it --name cont3 -v /volume2 ubuntu
+
+3.VOLUME MOUNTING :
+here first create the volume outside the container and i will attach the volume to  the container.
+volume commands:
+docker volume create volume3		: to create the volume
+docker volume ls 			: to list the volumes
+docker volume inspect volume3 		: to see the path 
+cd mountpath				: go to that path and create some files 
+
+now we will attach that volume 3 to the container 
+docker run -it --name cont5 --mount source=volume3 destination=/volume3 ubuntu
+
+now i have 10 files in my local i want to send it to volume4 it is in container 6
+
+first i need to check volume4 is in which container 
+docker inspect cont6  -> name : volume4 
+docker volume inspect cont6   --> copy that path
+cp * _path
+
+
+METHOD-4:
+copy the files directly to the container from local
+cp * /home/ec2-user/
+docker run -it --name cont10 -v /home/ec2-user:/abcd ubuntu
+
+
+SYSTEM COMMANDS:
+you want to list all containers and volumes information
+docker system df	: to show the docker components resource utilization
+docker system df -v	: to show the docker components resource utilization indiduvally
+
+docker system prune 	: to delete all unused ,stopped ,dangled components 
+docker system events	: it is going to tell what exactly events happened 
+
+JENKINS SETUP WITH THE HELP OF DOCKER :
+docker run -it --name cont1 -p 8080:8080 Jenkins/Jenkins:lts
+
+==============================================================================
+
+Services inside the server in containers
+
+dnf install docker -y
+ststemctl start docker
+create index.html
+go to wcschools login page and copy some frontend code  
+vim Dockerfile
+
+FROM ubuntu
+RUN apt update -y
+RUN apt install apache2 -y
+COPY index.html /var/www/html
+CMD ["usr/sbin/apachectl", "-D" , "FOREGROUND"]
+
+docker build -t movies:v1 .
+docker run -itd --name movies -p 81:80 movies:v1
+ip_adress:81 --> you can see the front end application
+
+NOTE : we can change the container port (81). we cant change the port no 80 because it is image port number
+
+so in this manual method we are going to deploy the application in manual way one by one but it is not automation way this is the drawback of this manual method so we have to use the automation way for that purpose we are going to use DOCKER COMPOSE 
+
+
+DOCKER COMPOSE :
+its a tool used to launch multiple containers.
+we can create a multiple containers on single host .
+all of the services info we are going to write on a file.
+here we use docker-compose.yml file.
+it will be on yaml format 
+we use key value pair (dictonary)
+used to manage the multiple services nothing but containers.
+
+NOTE : whenever we download a package on file format we need to move that file to bin folder . because all the user executable files will be in bin folder only 
+and we need to give the executable permission for that file to work as a command.
+
+
+
+vim docker-compose.yml
+
+version: '3.8'
+services:
+  movies:
+    image: movies:v1
+    ports:
+      - "90:80"
+
+  train:
+    image: train:v1
+    ports:
+      - "91:80"
+
+  dth:
+    image: dth:v1
+    ports:
+      - "92:80"
+
+  recharge:
+    image: recharge:v1
+    ports:
+      - "93:80"
+~                                                                                                                                                                        
+~                    
+:wq
+
+docker-compose up -d  --> to run the docker-compose file 
+
+
+sed -i 's/port/ports/' docker-compose.yml
+
+docker kill $(docker ps -a -q)
+docker rm $(docker ps -a -q)
+
+docker-compose up -d
+
+if you want to delete the all containers from compose file 
+
+docker-compose down -d
+
+if you want to stop the containers from compose file 
+
+docker-compose stop -d
+
+if you want to start the containers from compose file 
+
+docker-compose start -d
+
+if you want to pause the containers from compose file 
+
+docker-compose pause -d
+
+if you want to unpause the containers from compose file 
+
+docker-compose unpause -d
+
+docker compose images : we will get the images only used by the docker-compose file 
+
+docker-compose ps : we will get the running images 
+
+docker-compose logs : we will get the logs about the compose file
+
+docker-compose kill
+
+docker-compose start
+
+docker-compose rm movies : it will remove all containers which is on stopped mode 
+
+docker-compose top  : to see the all processes in container 
+
+NOTE : if you want to change the docker-compose name to pavan.yml
+
+mv docker-compose.yml pavan.yml
+
+docker-compose stop  : it will not work because it is supporting command we dont change 
+
+docker-compose -f pavan.yml stop : now it will work 
+
+
+NOTE : As of know we are using the docker compose for to launch the all services in containers in single host for suppose 
+       if the server nothing but main host is got deleted. in that case we cant do anything. for that purpose we need to maintain the 
+       high availability.
+
+
+HIGH AVALIABILITY :  deploying the app on more than one servers means using cluster.
+
+=======================================================================================================
+
+DOCKER HUB :
+it is a central platform used to store the docker images we create on host then we will push them to docker hub.
+Once image is available in docker server we can use that image in any server.
+We use repos to store the images.
+Repo types : public , private 
+
+ACCOUNT :
+build a docker image 
+docker login 
+docker tag movies:v1 repo_name
+docker push repo_name
+
+HOW TO PULL FROM DOCKER HUB : 
+docker run -itd --name cont1 repo_name:latest
+
+
+
+
+DOCKER SWARM : 
+high availability : deploying the app on more than one servers means using cluster.
+
+docker swarm is container orchestration tool 
+it is used to manage multiple containers on multiple nodes.
+each node will have a copy of single container.
+here we have manager and worker nodes.
+manager node will create a containers and send to worker nodes.
+worker nodes will take the container and manage them.
+manager node communicates with worker node by using token.
+
+SETUP :  
+create 3 servers (1 = manager 2 = worker nodes ) (all traffic is must)
+install docker and set the hostnames.
+in all manager and worker nodes 
+
+dnf install docker -y
+systemctl start docker 
+systemctl status docker 
+hostnamectl set-hostname manager / worker-1 / worker-2
+
+in manager node :
+docker swarm init	: it is going to generate the token
+copy the token to all worker nodes 
+docker node ls   	: to list the all nodes that joined 
+
+Note : if we want token again
+docker swarm join-token worker
+docker swarm join-token worker
+now the cluster is ready.
+
+SERVICES :
+it is a way of exposing the application in docker.
+with services we can create multiple copies of same container.
+we can distribute the containers to all servers.
+
+how to create service :
+docker service create --name movies --replicas=3 --publish 81:80 repo_name:latest
+
+
+commands: 
+docker service ls	: to list the services 
+
+docker service ps train	: to list all containers on train replicas 
+
+docker service inspect train	: to give the complete information about that service 
+
+docker service scale train=10	: it will scale to 10 services 
+
+docker service rollback train	: it will roll back the previous scaling 
+
+docker service rm train		: it is going to remove the train service , docker service ls 
+
+Note : if you delete the container again it is going to heal the container that means the container will recreate again.
+
+
+CLUSTER LEVEL ACTIVITIES :
+docker swarm leave (worker node)	: to down the worker node 
+
+Note : when you down the worker node we need to copy and run the token one more time in worker node to rejoin the worker node in to cluster
+
+if i want to delete the node 
+
+docker node rm node_id		: it will delete the worker node from manager node 
+
+Note : if you want to delete the worker node it have to be down then only it is delete the node 
+
+in some case we need yo patch up the servers. in that case we will use this advantage 
+
+first i will down the server-1 and rectify that. next i will down the server-2 in that server-1 will servs the application.
+
+docker stack deploy -c docker-compose.yml Paytm
+
+
+docker stack -c docker-compose.yml Paytm
+
+docker stack ls		: it will list the all stacks 
+
+docker service ls	: it will list the all services 
+
+
+
+PORTAINERS :
+1) it is a container organizer , designed to make tasks easier , whether they are clustered or not 
+2) able to connect multiple clusters, access the containers , migrate the stacks between clusters 
+3) it is not a testing environment mainly used for production routines in large companies 
+4) Portainer consist of two elements , the pointer server and the pointer agent
+5) both elements run as light weight Docker containers on Docker engine 
+
+
+docker stack rm stack_name	: remove the stack
+
+docker service rm service_name 	: remove the service 
+
+
+
+
+NETWORKING CONCEPTS :
+suppose i have two containers app , database 
+if app server wants to communicate with database server with ip addresses it is okay but some issues the we nned to delete the container and create new one in that case the ip addresses is going to change. so there is connection issues in order to overcome that one we have to create the network.
+coming to networks we have 4 types of network:
+1) Bridge Network :
+in same server i have the two different containers if they want to communicate with each other in that case bridge network is used.
+
+2) Host Network :
+it is nothing but the ec2 server network is used by the container nothing but the container ip address and ec2 ip address is same in that case we are going to use the host network.
+
+3) None Network : 
+when you dont want to expose the container to the world in that case we are going to use the none network that means it will not provide the any network to the container.
+
+4) Overlay Network :
+used to communicate containers with each other across multiple docker hosts.
+
+
+
+
+docker network ls	: it will show the all networks
+
+docker network create Paytm 	: it will create the Paytm network 
+
+docker inspect network Paytm 	: it will show the all information about the Paytm
+
+docker network connect Paytm cont1 : it will attach the cont1 to Paytm
+
+docker network connect Paytm cont2 : it will connect the cont2 to Paytm
+
+docker network disconnect Paytm cont1 : it will disconnect cont1 to Paytm
+
+docker network rm Paytm		: it will remove the service 
+
+to check the connection established between :
+
+go to cont1
+
+docker attach cont1
+
+apt update -y
+
+apt install iputils-ping -y
+
+ping ip_adress of cont 1  
+
+
+RESOURCE MANAGEMENT :
+containers are going to use the host resources. ( cpu , mem , ram )
+we need to limit that host resource utilization.
+by default containers are not having limits.
+
+how to set limits :
+
+docker run -it --name cont3 --cpus="0.5" --memory="500mb" ubuntu
+
+docker inspect cont3  : we can see the memory and cpus 
+
+docker stats	: it will direct give the cpu and mem information of all containers
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,574 @@
+Ansible Notes :
+in previous only deployment is automated.
+not server creation
+not software installation
+not tomcat setup
+Deployment 
+with the help of this tool we can automated the above things
+
+ANSIBLE:  
+ansible is a free and open source tool
+its an it engine which automates from the server creation to deployment 
+it is also called as configuration management tool.
+configuration: cpu, memory and os 
+management : update , delete , install ..
+ansible invented by michale dehaan in 2012
+ansible is taken by red hat and we have the both free and paid version of the ansible.
+it is platform independent.
+ansible works with YAML language.
+ansible dependency is python.
+GUI for the ansible is Ansible-Tower 
+
+Architecture :
+
+ANSIBLE SERVER : used to communicate with worker nodes and install the packages, deployment 
+WORKER NODES : takes commands from ansible server and works according to it 
+PLAY BOOK : contains the code which is used to perform action.
+INVENTORY : contains info about worker nodes and groups (combination of worker nodes)
+
+SETUP:
+Create 5 servers (1= ANSIBLE SERVER , 2- DEV SERVERS , 2- TEST SERVERS)
+ALL SERVERS:
+
+sudo -i
+hostnamectl set-hostname ansible /dev-1/dev-2/test-1/test-2
+sudo -i
+
+passwd root 
+new password :
+retype password :
+
+if root user want to login in to nodes we need to edit one file :
+we need to edit one file that is shhd
+ vim /etc/ssh/sshd_config
+:38 --> un comment that line
+:63 --> replace (no=yes)
+
+here ssh is a service when ever we are modifying the service we need to restart the service 
+systemctl restart sshd
+systemctl status sshd 
+
+ANSIBLE SERVER : go to ansible main server 
+command to install ansible : amazon-linux-extras install ansible2 -y or 
+
+sudo dnf update -y
+sudo dnf install ansible-core -y
+dependency : yum install python python-pip python-devel -y
+
+worker node information is going to store in inventory file :
+path of inventory file :vim /etc/ansible/hosts
+:12 
+give the groups :
+[dev]
+private ip_adress -> dev1
+private ipadress -> dev2
+[test]
+private ip_adress -> test1
+private ip_adress -> test2
+
+okay inventory file is ready 
+how ansible is going to communicate with worker node 
+when ever ansible is want to communicate with worker nodes we are going to generate the keys on ansible main server
+ssh-keygen
+click enter 4 times : to generate the key 
+
+if i want to communicate with worker node :
+ssh-copy-id root@private_ip address of dev1 --> yes --> password 
+ssh private ip_adress of worker node 
+
+
+
+on ansible main server :
+ssh-keygen -t rsa -b 4096
+cat ~/.ssh/id_rsa.pub
+
+on worker node :
+mkdir -p ~/.ssh
+vi ~/.ssh/authorized_keys
+
+paste thekey 
+
+ansible all -m ping 
+
+
+
+
+
+
+
+
+
+
+
+
+
+NOTE : copy the keys to all worker nodes by using the above code 
+
+ADHOC COMMANDS:
+1. these are simple Linux commands 
+2. used for temp works 
+3. these commands will be over rided 
+if you want to install the git or any other softwares in all the worker nodes from ansible main server
+
+ansible all -a "yum install git -y"
+
+if you want to install the git or any other softwares in all the dev/test worker nodes from ansible main server
+
+ansible dev -a "yum install git -y"
+
+INSTALL MAVEN 
+ansible all -a "yum install maven -y"
+to check --> ansible all -a "mvn --version"
+
+ansible inventory host patterns:
+you want to list all the worker nodes :
+ansible all --list-hosts 
+ansible dev --list-hosts
+ansible test --list-hosts
+ansible test[0] --list-hosts   
+
+last server : ansible all[-1] --list-hosts
+last but 2 server : ansible all[-2] --list-hosts
+range :
+node 10 to 20 : ansible all[9:19] --list-hosts
+
+
+ANSIBLE MODULES:
+modules works on key value pair.
+modules used to complete the work which we want 
+depend on the work module will change 
+
+how to use modules :
+install the git in all worker nodes : ansible all -m yum -a "name =git ,state=present"
+delete the git in all worker nodes : ansible all -m yum -a "name =git , state=absent"
+install latest version of something : ansible all -m yum -a "name=git , state=latest"
+copy the file to all worker nodes : ansible all -m copy -a "name=file1, dest=/tmp"
+create user to all worker nodes : ansible all -m user -a "name =pavan state=present"
+start the service in all worker nodes : ansible all - service -a"name=Jenkins state=started"
+stope service in all worker nodes : ansible all - service -a"name=Jenkins state=stoped"
+
+if you want to execute the multiple modules in all worker nodes: PLAYBOOKS
+PLAYBOOKS:
+playbook is used to execute the multiple modules :
+extension is .yaml
+yet another markup language 
+language start with --- and end with ...
+--- 
+-tasks:
+	-name : create user
+	user:"name=pavan,state=present"
+	
+	-name: install the maven 
+	yum:"name=maven,state=present"
+
+after saving file 
+execute file : ansible-playbook pavan.yml
+
+TAGS:
+if i want to execute the yaml file but one module i want to execte :
+--- 
+- hosts:all
+ tasks:
+	-name: create user
+	user:"name=pavan,state=present"
+	tags: a
+	
+	-name: install the maven 
+	yum:"name=maven,state=present"
+	tags: b
+
+ansible-playbook pavan.yml --tags a --> execute only a tag
+ansible-playbook pavan.yml --skip-tags "a,b" -->both tags will skip 
+
+========================================================================= 
+
+vim pavan.yml
+
+-hosts:all
+tasks:
+	- name:intsall maven
+	shell:yum install maven
+	
+	- name: install git 
+	  command:yum install git 
+	
+	- name: install docker
+	  raw:yum install docker
+
+
+
+SHELL VS COMMAND VS RAW
+
+RAW >> COMMAND >> SHELL
+
+the advantage of the raw module is no need to install the python dependency
+
+sed -i 's/word1/word2/' pavan.yml
+
+
+VARIABLES:
+
+STATIC VARS: vars which will define inside the playbook
+DYNAMIC VARS : vars which are not define inside the playbook
+-hosts:all
+vars:
+   a:maven
+   b:git
+   c:docker
+tasks:
+	- name:intsall maven
+	  yum:name={{a}} state=present
+	
+	- name: install git 
+	  yum : name={{b}} state=present
+	
+	- name: install docker
+	  yum : name={{c}} state=present
+
+====================================================================================== 	 	 	
+
+Dynamic vars :
+
+-hosts:all
+vars:
+   a:maven
+   b:git
+   c:docker
+tasks:
+	- name:intsall maven
+	  yum:name={{a}} state=present
+	
+	- name: install git 
+	  yum : name={{b}} state=present
+	
+	- name: install docker
+	  yum : name={{c}} state=present
+
+	-name : install tree
+	 yum : name={{d}} state=present
+	
+	-name : install Jenkins
+	 yum: name={{e}} state=present
+
+ansible-playbook pavan.yaml --extra-vars "d=tree e=jenkins"
+
+
+LOOPS:
+install the multiple packages :
+
+-hosts:all
+ tasks:
+	-name:install packages
+	yum : name={{item}} state=present
+	with_items:
+		- git
+		- maven
+		- docker
+		- httpd
+		- tree
+
+the all packages will install
+
+
+
+TROUBLESHOOTING TECHNIQUES:
+how to remove the worker node from ansible main server :
+how to see how many worker nodes are connected to server : 
+1) cd .ssh
+2) cat known_hosts  -> you can see the all ip address of the nodes 
+
+
+
+CLUSTER : group of nodes / server 
+
+1)HOMOGENEOUS : servers with same os and flavour  
+
+2)HETROGENEOUS : servers with different os 
+
+CONDITIONS:
+-hosts:
+    tasks:
+	-name : installing apache
+	   yum : name=httpd state=present
+	when: ansible_os_family == "RedHat"
+	
+	-name : installing apache on Ubuntu
+	  apt : name=apache2 state=present
+	  when : ansible_os_family == "Debian"
+
+==============================================================
+
+HANDLERS:
+like linked jobs
+suppose i want to restart the httpd . without installing https is it possible to restart the httpd. 
+when task one is executed it will call the task-2 to perform the task
+ex : if we want to restart httpd we need to install it that mean restarting depends on installing.
+
+Note : here we have notify module
+
+-hosts:all
+       tasks:
+	-name : installing apache 
+	 yum : name=httpd state= present
+	 notify:starting apache
+handlers:
+
+	-name : starting apache
+	 service : name = httpd state=started 
+
+
+ANSIBLE VAULT:
+in order to store the files securely to do the encryption 
+we can encrypt files , playbooks 
+Technique : AES256(Used By FaceBook)
+vault will store our data very securely . 
+if we want to access any data which is in vault we need to give the password 
+Note : we can restrict the users to run the playbook
+create a vault 			:ansible-vault create file1.txt
+edit the vault			:ansible-vault edit file1.txt
+change the password 		:ansible-vault rekey file1.txt
+decrypt the data		:ansible-vault decrypt file1.txt
+encrypt the data		:ansible-vault encrypt file1.txt
+to see the data without decryp 	:ansible-vault view creds1.txt
+
+DRYRUN:
+without running the playbook we can see the output what is going to happen 
+ansible-playbook pavan.yml --check 
+
+PIP: 
+it is a package manager it is used to  install the python libraries 
+
+Redhat : yum
+Ubuntu : apt 
+Python : pip 	
+
+
+
+ROLES:
+used to divide the plybook in to directory structure 
+we can organize the playbooks 
+we can encapsulate the data 
+we can reduce the playbook length
+
+mkdir playbooks
+cd playbooks 
+yum install tree -y
+mkdir -p roles/one/tasks
+vim roles/one/tasks/main.yml
+name:installing the maven 
+yum : name=maven state=present
+vim master.yml
+- hosts: all
+   tasks:
+     -one
+
+
+how can we use variables in roles :
+roles/one/vars/main.yml : a: docker --> save
+
+roles/docker/tasks/main.yml
+
+- name: remove docker
+  yum: name="{{a}}" state=absent
+ 
+
+execute ansible-playbook master.yml
+
+
+another method:
+
+- name: remove docker
+  yum: name="{{a}}" state=absent
+  vars:
+    a: docker
+
+another method : in master yml
+
+- hosts: all
+  vars:
+    a: docker
+  roles:
+    - one
+
+in main:
+- name: remove docker
+  yum: name="{{a}}" state=absent
+
+
+
+
+ANSIBLE GALAXY:
+ansible-galaxy search java --> it will search java role i galaxy 
+ansible-galaxy install user_name
+ansible-galaxy search --author user_name
+
+
+DEBUG MODULE:
+it is used to print the custom output :
+suppose if we give the 
+ansible all -m setup 	: it will give the complete information.
+i dont want the complete information i want only 4 to 5 parameters
+
+ansible_architecture
+ansible_os_family
+ansible_python_version
+ansible_os_family
+
+- hosts: all
+  tasks:
+    - name: printing messages
+      debug:
+        msg: "ansible os family is {{ansible_os_family}},ansible architecture is {{ansible_architecture}}, ansible pthon version is {{ansible_python_version
+}}"
+~       
+
+
+
+JINJA2 TEMPLATE :
+used to get the custom output.
+it is a text file which can extract the variables
+and these values will change as per the time 
+
+
+LOOKUPS:
+the purpose of using ansible lookups is suppose we have some data in textfile . or we have some data on anyfile. if we want to get that data form file or database or key values  or form external source in that case we are going to use the lookups.
+
+- hosts: all
+  vars:
+    a: "{{ lookup('file','/home/ec2-user/creds.txt') | trim }}"
+  tasks:
+    - name: Print value from file
+      debug:
+        msg: "hi my name is {{ a }}"
+
+
+
+Note : by default when ever we are executing the playbook we are getting the gather facts
+	when ever we are writing the conditions in playbook we never put the gather facts is 	false because if you put that how it can get the worker node 	information(gather facts ) and executing the condition.
+in real time we never put gather facts= false it is a blender mistake
+
+- hosts: all
+  gather_facts: false
+  vars:
+    a: "{{ lookup('file','/home/ec2-user/creds.txt') | trim }}"
+  tasks:
+    - name: Print value from file
+      debug:
+        msg: "hi my name is {{ a }}"
+
+
+ANSIBLE STRATEGIES:
+
+LINEAR	: execute tasks sequencially
+FREE	: execute all tasks on all nodes at the same time.
+ROLLING	:
+SQUENCE	:
+BATCH	:
+
+- hosts: all
+  strategy: free
+  vars:
+    a: "{{ lookup('file','/home/ec2-user/creds.txt') | trim }}"
+  tasks:
+    - name: Print value from file
+      debug:
+        msg: "hi my name is {{ a }}"
+
+
+
+LAMP STACK:
+L	: LINUX
+A	: APACHE
+M	: MYSQL
+P	: PHP
+
+deploying application in to apache:
+lamp.yml:
+- hosts: all
+  tasks:
+    - name: installing apache
+      dnf: name=httpd state=present
+      
+    - name: starting apache
+      service: name=httpd state=started
+      
+    - name: git installing
+      dnf: name=git state=present
+      
+    - name: git checkout
+      git:
+        repo: "https://github.com/Pavankumar-git31/NetflixClone.git"
+        dest: "/var/www/html"
+
+
+SETTING TOMCAT SERVER IN ANSIBLE PLYBOOK:
+
+- hosts: all
+  tasks:
+    - name: installing tomcat
+      get_url:
+        url: "https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.115/bin/apache-tomcat-9.0.115.tar.gz"
+        dest: "/root/"
+
+    - name: untar the tomcat file
+      command: tar -xzvf apache-tomcat-9.0.115.tar.gz
+
+    - name: installing java
+      command: dnf install java-11-amazon-corretto -y
+
+    - name: setting roles in tomcat
+      template:
+        src: tomcat-user.xml
+        dest: /root/apache-tomcat-9.0.115/conf/tomcat-users.xml
+
+    - name: deleting the lines
+      template:
+        src: context.xml
+        dest: /root/apache-tomcat-9.0.115/webapps/manager/META-INF/context.xml
+
+    - name: start the tomcat server
+      shell: nohup /root/apache-tomcat-9.0.115/bin/startup.sh
+~                                                               
+
+
+
+DEPLOYING THE WAR FILE IN TOMCAT SERVER:
+- hosts: all
+  become: yes
+  tasks:
+    - name: copy war file to tomcat webapps
+      copy:
+        src: /root/sample.war
+        dest: /root/apache-tomcat-9.0.115/webapps/sample.war
+        mode: '0644'
+
+    - name: restart tomcat
+      shell: |
+        /root/apache-tomcat-9.0.115/bin/shutdown.sh || true
+        sleep 5
+        /root/apache-tomcat-9.0.115/bin/startup.sh
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

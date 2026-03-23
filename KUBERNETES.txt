@@ -1,0 +1,1512 @@
+KUBERNETES :
+Earlier we use the docker swarm as a container orchestration tool that we used to manage the multiple containerized applications on our environments 
+
+Docker swarm :
+1) Setup	  	: easy
+2) Auto Scaling		: no Auto Scaling 
+3) Community		: good community
+4) GUI			: no gui
+
+Kubernetes :
+1) Setup		: complex
+2) Auto Scaling		: Auto Scaling 
+3) Community 		: grater community
+4) GUI			: GUI
+
+The Reason :
+the reason we are going to docker to Kubernetes is Automating the scaling , load Balancing , Deployment 
+
+
+Docker Swarm is easy to use and suitable for small clusters, but Kubernetes provides advanced scalability, self-healing, and a rich ecosystem, which makes it the preferred choice for large-scale production systems.
+
+
+KUBERNETES :
+1) it is an open source container orchestration tool 
+2) it is used automates many of the manual processes like deploying , managing and scaling containerized applications.
+3) Kubernetes was developed by the google using Go language 
+4) Google donated K8's to CNCF in 2014
+5) 1st version was released in 2015
+
+
+Architecture 
+
+Docker Swarm :
+1) Cluster 
+2) Nodes 
+3) Containers
+4) Application
+
+Kubernetes :
+1) Cluster 
+2) Nodes 
+3) Pods
+4) Containers 
+5) Application
+
+Note : the only difference in docker and Kubernetes is pod
+
+
+Kubernetes don't know about the containers , so don't communicate with containers it will only communicate with only pods.
+
+
+COMPONENTS OF KUBERNETES :
+
+1) API SERVER :
+it is like client in docker it is taking commands from user and then it will give the output.
+if want to create a pod the API server take that command and give the output.
+
+2) ETCD : 
+it is a database for the cluster , all the cluster info will store here 
+
+3) SCHEDULER :
+suppose i tell to API server create a pod . then api server check in ETCD whether there is pod exist or not . if not exists then it will tell to scheduler. then scheduler is going to create a pod. 
+for suppose i have a 2 worker nodes . if i give command to create a pod. in which worker node scheduler is going to create a pod. 
+which worker node having more hardware (cpu's ,ram ) in that worker node scheduler is going to create a pod.
+
+4) CONTROLLER :
+it will control the k8's objects.
+1. cloud controllers :
+if we create a Kubernetes cluster on cloud. the cloud controllers is going to work.
+
+2. Kube Controllers :
+if i create a Kubernetes cluster on on-prem servers the kube controllers is going to work.
+
+
+WORKER NODE COMPONENTS :
+
+1)KUBELET :
+it is an agent used to communicate with master. will let the events happened on worker node to master.
+
+2)KUBE-PROXY :
+it delas with networking 
+
+3)POD :
+it is a group of containers 
+
+
+TYPES OF KUBERNETES CLUSTER :
+
+1) SELF MANAGER K8'S CLUSTER :
+ we need to manage the k8's cluster. 
+   a. minikube ( single node cluster )
+   b. kubeadm ( multi node cluster )
+   c. Kops
+
+2) CLOUD MANAGER K8'S CLUSTER :
+   a. AWS EKS
+   b. AZURE AKS
+   c. GCP GKS
+   d. IBM IKE
+
+
+some companies prefer to use the self manager cluster , and some companies prefer to use the cloud manager cluster.
+
+MINIKUBE :
+It is used to setup the single node cluster on k8's.
+It contains API servers , ETDC database and container run time.
+It helps to containerized the applications.
+It is used for development , testing and experimentation purposes on local. Here Master and Worker runs on same machine.
+It is a platform independent.
+By default it will create one node only.
+Installing Minikube is simple compared to other tools.
+
+Note : we didn't implement this on real time in production. only for developing and testing only.
+
+
+REQUIREMENTS :
+1) 2cpu's
+2) 2GB of free ram 
+3) 20GB of free disk space 
+4) container manager : Docker 
+
+MINIKUBE SETUP : (ubuntu)
+sudo -i
+apt update -y    	: it shows the list of updates we have but didn't update 
+
+apt upgrade -y		: it is going to update.
+
+
+after installing the minikube and kubectl
+
+start the kubectl : 	minikube start --driver=docker --force
+
+minikube status 	: list the status 
+
+kubectl get pod 	: list the pods 
+
+kubectl get po		: list the pods
+
+kubectl get pods	: list the pods 
+
+kubectl get po -o wide 	: it will give some additional information
+
+
+PODS :
+pods is a wrap around the containers.
+Mostly we can use single container inside the pod but if we required , create the multiple containers inside the pod 
+When we create 	a pod , containers inside pods can share the same namespace , and can share the same storage volumes 
+while creating the pod , we must specify the image , along with any new configuration and resource limits.
+K8's cannot communicate with containers they can communicate with pods 
+
+we can create the pod using two two ways:
+1) Imperative (command)
+2) Declarative (Manifest file)
+
+Imperative : kubectl run pod1 --image pavankumarkothala31/train:latest
+
+kubetcl delete pod pod1 	: to delete the pod 
+
+kubectl describe pod pod1	: it will describe the all information about the pod
+
+
+DECLARATIVE METHOD :
+vim abc.yml
+
+apiVersion: v1
+kind: pod
+metadata:
+  name: pod1
+spec:
+   containers:
+      - image: nginx
+         name: cont1
+
+
+kubetcl create -f abc.yml
+
+
+NOTE : if you want to get all the resources (shortcuts) about the manifest file give the command
+
+kubectl api-resources
+
+
+
+
+DRWABACK IN POD : when we create a pob and deploy the application inside the pod. 
+if the pod get deleted it might be risky because if something will happen to that pod. it might be risky 
+and all the load handeled by the single pod 
+
+REPLICA SET :
+it will create a same pod of multiple replicas.
+if you delete one pod it will create automatically.
+we can distribute the load also.
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: train-rs
+  labels:
+    app: train
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: train
+  template:
+    metadata:
+      labels:
+        app: train
+
+    spec:
+      containers:
+        - name: cont1
+          image: nginx
+
+kubectl create -f pavan.yml
+
+kubectl get rs
+
+kubectl get rs -o wide 
+
+
+
+HOW TO SCALE THE REPLICAS :
+kubectl scale rs/train-rs --replicas=10
+
+
+HOW TO UNSCALE :
+LIFO : if you unscale the pods it will delete the pod which is created lastly
+
+kubectl scale rs/train-rs --replicas=5
+
+
+Delete the all pods in replicaset :
+kubectl delete pod -l app=train
+
+Delete the pods in indiduvally :
+kubectl delete pod --all
+
+
+
+
+
+DRWABACK OF REPLICASET:
+for suppose if you update the replica set file. it will update in that file but it will not reflect to the pods individually 
+
+kubectl edit rs/train-rs
+edit the nginx and save .
+kubectl describe rs train-rs    : here it will show the updated
+
+but in check pods indiduvally 
+
+kubectl get pods 
+kubectl describe pod pod_name	: it will show here un updated
+
+
+Note : so in these kind of situations we are going to use the deployment.
+
+
+DEPLOYMENT :
+it will do all operations which cannot be done in Replica Set
+it will do roll back which cannot be done in Replica Set
+
+
+
+
+NOTE : if MINIKUBE got deleted what will happen. it might be risky.
+
+so we need to maintain the high avaliability
+
+
+
+KOPS :
+kOps is also known as Kubernetes operations , is a open source tool that helps you create , destroy , upgrade , and maintain high availability , production grade Kubernetes cluster. 
+Depending on the requirement , kops can also provide the cloud infrastructure 
+
+Kops is mostly used in deploying AWS and GCE Kubernetes clusters. But Officially the tool only supports AWS . Support for other cloud providers ( such as DigitalOcean , GCP , OpenStack ) are in beta stage.
+
+Infrastructure : resources we need to run our application on cloud 
+
+ex: ec2 , vpc , ALB ....
+
+
+Advantages :
+
+1) Automates the provisioning of AWS and GCE Kubernetes clusters 
+
+2) Deploys highly available Kubernetes masters 
+
+3) supports rolling cluster updates 
+
+4) Autocompletion of commands in command line 
+
+5) Generates Terraform and cloud formation configurations.
+
+6) Manages cluster add-ons
+
+7) supports state async model for dry runs and automatic idempotency
+
+8) creates instance groups to support heterogeneous cluster.
+
+ALTERNATIVES :
+Amazon Eks  , MINIKUBE , KUBEADM , TERRAFORM , RANCHER 
+
+
+How to work with KOPS:
+first thing kops is a third party tool so in order to work with aws we need to give the permission to work with third part tool.
+
+STEP-1 : Giving permission
+IAM ---> USER ----> CREATE USER ---> NAME: KOPS ---> NEXT --> ATTACH POLOCIES DIRECTLY --> ADMINISTRATOR ACCESS --> next --> create user 
+
+USER --> SECURITY CREDIENTIALS --> CREATE ACCESS KEYS --> CLI --> CHECKBOX --> NEXT --> CREATE ACCESS KEY --> DOWNLOAD .CSV file
+
+
+go to the server and type 
+
+aws configure 
+
+give access key
+
+give secret access key
+
+give the region ex: ap-south-1
+
+table format : table
+
+ 
+
+STEP-2 :
+install the kubectl and kops and give the executable commands and move to the /usr/local/bin 
+
+NOTE : after installing the kops and kubectl . when you directly execute the commands the commands is not going to work.
+but in ubuntu it will work but in amazon Linux the commands is not going to work .
+we need to modify the bashrc file 
+
+vim .bashrc
+
+go to the bottom and type 
+
+export PATH=$PATH:/usr/local/bin/
+
+:wq
+
+source .bashrc	: without this it will not work 
+
+kops version
+
+kubectl version
+
+
+
+STEP-3 : CREATING BUCKET 
+what is meant by the bucket as of know we are creating the infrastructure. 
+the main purpose of the bucket is to store the data
+that complete information of the infrastructure is going to store in the bucket.
+
+why?
+for example our cluster got deleted and facing some issues. but our information is in bucket we can easily recreate the cluster with the help of the bucket 
+it is like a backup of the cluster and infrastructure.
+
+how to create a bucket search s3 in aws and we can see the buckets 
+
+in cmd :
+
+aws s3api create-bucket --bucket bucket_name --region us-east-1
+
+aws s3 api put-bucket-versioning --bucket bucket_name --region us-east-1 --versioning-configuration Status-Enabled
+
+export KOPS_STATE_STORE=s3://bucket_name
+
+
+
+
+
+STEP-4 :
+
+CREATE THE CLUSTER:
+kops create cluster --name cluster_name --zones us-east-1 --master-count=1 --master-size t2.medium --node-count=2 --node-size t2.micro
+
+kops update cluster --name cluster_name --yes --admin 
+
+
+ADMIN ACTIVITIES 
+TO SCALE THE NODES:
+
+kops get cluster 	: list the cluster 
+
+kubectl get no 		: get the nodes 
+
+kops edit cluster cluster_name 	: we can edit the cluster 
+
+kops edit ig --name=cluster_name nodes-regionname 
+edit max size and min size to 4 and save and give kops update cluster and cluster_name --yes --admin 
+
+kops rolling update cluster --yes
+
+edit the master nodes :
+
+kops edit ig --name=cluster_name master-regionname 
+
+HOW TO DELETE THE CLUSTER :
+
+kops delete cluster --name cluster_name --yes 
+
+kubectl describe node node_id
+
+
+
+
+NAME SPACE :
+
+it is used to divide the cluster to multiple teams on real time.
+it is used to isolate the env
+the main intention is to using the name space is to divide the cluster 
+
+CLUSTER: HOUSE 
+NAME SPACE:ROOM
+
+Each name space is isolated
+if you are room-1 are you able to see room-2
+we cant access the objects form one namespace to another namespace 
+
+TYPES:
+default 		: it is the default namespace , all objects will create here only.
+kube-node-lease	: it will store objects which is taken from one namespace to another.
+kube-public 		: all public objects will store here.
+kube-system		: default k8's will create some objects , those are storing on ns.
+
+
+kubectl get ns : it will get all name spaces .by default there is four inbuilt name spaces are there.
+
+kubectl get po -n default    : all default pods will get.
+
+kubectl get po -n kube-node-lease  : list the pods took from another node
+
+kubectl get po -n kube-public  : list the pods all publically avaliable 
+
+kubectl get po -n kube-system  : list the all pods created by the kubernetes 
+
+kubectl get po -A    : it will give the all pods and namespaces as well.
+
+
+
+
+
+
+HOW TO CREATE THE NAME SPACE :
+kubectl create ns dev  
+
+kubectl get ns 
+
+HOW TO SWITCH TO THAT PARTICULAR NAME SPACE :
+
+kubectl configure set-context --current --namespace=dev
+
+HOW TO SEE THE CURRENT NAME SPACE 
+
+kubectl view config | grep -i namespace
+
+kubectl delete pod devpod1 -n dev
+
+
+NOTE : by deleting the ns all objects is going to delete.  (kubectl delete ns dev)
+but in real time we use RBAC to restrict the access from one namespace to another.
+so users cant access/delete ns , because of we provided the restriction.
+we create roles and rolebind for the users.
+
+
+
+
+SERVICES :
+it is used to expose the application in Kubernetes.
+
+TYPES :
+CLUSTERIP : it will work inside the cluster.
+it will not expose to the outer world.
+
+for example i have a application i want to use that application inside the cluster i dont want to expose the application to the outer world in that case im going to use the clusterip service.
+
+i have a database i dont want to expose the database to the outer world in that case iam going to use this service.
+
+
+
+vim abc.yml
+apiversion: apps/v1
+kind: deployment
+metadata:
+  - name: swiggy_deploy
+  labels:
+   app: swiggy
+spec:
+  replicas: 3
+  selector:
+   matchLabels:
+    app: swiggy
+  template:
+    metadata:
+     labels:
+       app: swiggy
+  spec:
+    containers:
+     - name: cont1
+       image: pavankumarkothala3/train
+       ports:
+        - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata: 
+   name: sv1
+spec:
+ type: ClusterIP/NodePort
+ selector:
+   app: swiggy
+  ports:
+   - port: 80
+     
+
+
+
+kubectl get svc 
+
+kubectl config set-context --current --namespace=default
+
+kubectl create -f abc.yml
+
+kubectl get deploy,svc
+
+kubectl delete -f abc.yml
+
+
+DRAWBACK : we cannot use app outside.
+
+2.NODEPORT: it will expose our application in particular port 
+Range : 30000 - 32767 (in sg we need to give all trafic)
+
+vim abc.yml
+apiversion: apps/v1
+kind: deployment
+metadata:
+  - name: swiggy_deploy
+  labels:
+   app: swiggy
+spec:
+  replicas: 3
+  selector:
+   matchLabels:
+    app: swiggy
+  template:
+    metadata:
+     labels:
+       app: swiggy
+  spec:
+    containers:
+     - name: cont1
+       image: pavankumarkothala3/train
+       ports:
+        - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata: 
+   name: sv1
+spec:
+ type: NodePort
+ selector:
+   app: swiggy
+  ports:
+   - port: 80
+     targetPort: 80
+     nodePort: 32700
+
+click on security groups and again click on inbound rules --> delete all of them --> add rules
+all traffic --> anywhere 
+
+
+ip address of workernode : 32700
+
+Note : in future if you want to change the port number 
+
+vim abc.yml
+
+change the port number 
+
+kubectl apply -f abc.yml
+
+
+
+
+LOAD BALANCER : 
+
+
+vim abc.yml
+apiversion: apps/v1
+kind: deployment
+metadata:
+  - name: swiggy_deploy
+  labels:
+   app: swiggy
+spec:
+  replicas: 3
+  selector:
+   matchLabels:
+    app: swiggy
+  template:
+    metadata:
+     labels:
+       app: swiggy
+  spec:
+    containers:
+     - name: cont1
+       image: pavankumarkothala3/train
+       ports:
+        - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata: 
+   name: sv1
+spec:
+ type: LoadBalancer
+ selector:
+   app: swiggy
+  ports:
+   - port: 80
+     targetPort: 80
+
+Example HPA command : kubectl autoscale deployment swiggy-deploy --cpu-percent=70 --min=3 --max=10
+
+kubectl get hpa
+
+kubectl get endpoints : it will give the traffic taken by all pods with different ip : and port numbers . so service is internally will use this .
+
+
+node auto scaler :
+kops edit ig nodes-us-east-1a
+
+spec:
+  minSize: 3
+  maxSize: 10
+
+kops update cluster --yes
+
+kops rolling-update cluster --yes
+
+
+
+debugging:
+8️⃣ Real debugging command
+
+When pod is pending, run:
+
+kubectl describe pod <pod-name>
+
+You will see reason like:
+
+0/3 nodes are available:
+3 Insufficient cpu
+
+or
+
+node(s) had taint that the pod didn't tolerate
+
+or
+
+node(s) didn't match node affinity
+
+
+
+
+4️⃣ Full scheduling flow
+
+Complete process:
+
+User creates pod
+        ↓
+API Server stores pod
+        ↓
+Scheduler notices unscheduled pod
+        ↓
+Filtering (remove invalid nodes)
+        ↓
+Scoring (rank remaining nodes)
+        ↓
+Select best node
+        ↓
+Binding
+        ↓
+Kubelet runs container
+     
+
+
+• Why sometimes Kubernetes fills one node first
+• Why sometimes it spreads pods across nodes
+• How companies reduce cloud cost using scheduler strategies.
+
+Pavan, this is a very important Kubernetes scheduling concept used in real production clusters. It explains why pods sometimes fill one node first and sometimes spread across nodes.
+
+This behavior mainly depends on scheduler strategies.
+
+The two important strategies are:
+
+1. Bin Packing
+2. Pod Spreading
+
+Think of it like packing clothes in suitcases.
+
+1️⃣ Bin Packing (Fill one node first)
+
+Bin packing means scheduler tries to fill one node as much as possible before using other nodes.
+
+Example cluster:
+
+Node1
+Node2
+Node3
+
+Pod requirement:
+
+CPU request = 1
+
+Node capacity:
+
+Node CPU = 4
+
+Pods arriving:
+
+4 pods
+
+Scheduler result with bin packing:
+
+Node1 → 4 pods
+Node2 → 0
+Node3 → 0
+
+So one node is fully used first.
+
+Why Kubernetes does this?
+
+Because companies want to reduce infrastructure cost.
+
+Example:
+
+3 nodes running = expensive
+1 node running = cheaper
+
+So if nodes become empty:
+
+Cluster autoscaler removes unused nodes
+
+This saves cloud cost.
+
+This strategy is used when:
+
+Goal = Cost optimization
+2️⃣ Pod Spreading (High Availability)
+
+Sometimes Kubernetes spreads pods across nodes.
+
+Example cluster:
+
+Node1
+Node2
+Node3
+
+Deployment:
+
+3 replicas
+
+Scheduler result:
+
+Node1 → 1 pod
+Node2 → 1 pod
+Node3 → 1 pod
+
+Why?
+
+Because if Node1 crashes, other pods still run.
+
+Example bad case:
+
+Node1 → 3 pods
+Node2 → 0
+Node3 → 0
+
+If Node1 fails:
+
+All pods gone
+Application down
+
+So spreading improves fault tolerance.
+
+3️⃣ Kubernetes default behavior
+
+Kubernetes tries to balance both:
+
+Cost optimization
++
+High availability
+
+
+
+Understanding this will make you 10× stronger in Kubernetes interviews and system design.
+
+tell me 
+
+Great Pavan 👍 Now let’s understand how the Kubernetes Scheduler actually chooses a node for a pod.
+This is a very common DevOps interview topic and also important for system design.
+
+The scheduler works in 3 main phases:
+
+1. Filtering
+2. Scoring
+3. Binding
+
+Think of it like a company hiring process.
+
+Job applicants → Screening → Ranking → Hiring
+
+Pods are the job applicants, and nodes are the companies.
+
+1️⃣ Phase 1 — Filtering (Eliminating unsuitable nodes)
+
+First, the scheduler checks which nodes are capable of running the pod.
+
+It removes nodes that cannot satisfy the pod requirements.
+
+Example cluster:
+
+Node1
+Node2
+Node3
+Node4
+
+Pod requirements:
+
+CPU request = 2
+Memory request = 2GB
+zone = us-east-1a
+
+Filtering checks:
+
+• CPU availability
+• Memory availability
+• Node selector
+• Node affinity
+• Taints / tolerations
+• Volume requirements
+• Max pods per node
+
+Example result:
+
+Node1 → Not enough CPU ❌
+Node2 → Wrong zone ❌
+Node3 → Tainted node ❌
+Node4 → Valid node ✅
+
+After filtering:
+
+Candidate nodes = Node4
+
+If no nodes pass filtering, the pod becomes:
+
+Pending
+
+This is when Cluster Autoscaler may create new nodes.
+
+2️⃣ Phase 2 — Scoring (Choosing the best node)
+
+If multiple nodes pass filtering, Kubernetes scores them to find the best node.
+
+Example filtered nodes:
+
+Node1
+Node2
+Node3
+
+Scheduler assigns scores based on different rules.
+
+Important scoring factors:
+
+1. Resource balance
+
+Kubernetes tries to balance CPU and memory usage across nodes.
+
+Example:
+
+Node1 CPU usage = 80%
+Node2 CPU usage = 20%
+Node3 CPU usage = 40%
+
+Scheduler prefers Node2 or Node3, not Node1.
+
+2. Least allocated resources
+
+Nodes with more free resources get higher score.
+
+Example:
+
+Node1 free CPU = 0.5
+Node2 free CPU = 3
+Node3 free CPU = 1
+
+Best node:
+
+Node2
+3. Pod spreading (High availability)
+
+Scheduler avoids placing all pods on one node.
+
+Example deployment:
+
+3 pods of same app
+
+Scheduler distributes them:
+
+Node1 → 1 pod
+Node2 → 1 pod
+Node3 → 1 pod
+
+This prevents single node failure affecting all pods.
+
+4. Image locality
+
+If a node already has the container image downloaded, scheduler may prefer that node.
+
+Example:
+
+Node1 → image already exists
+Node2 → image not present
+
+Node1 may get higher score because pod can start faster.
+
+Example scoring
+Node1 → score 40
+Node2 → score 85
+Node3 → score 65
+
+Best node:
+
+Node2
+3️⃣ Phase 3 — Binding (Assigning pod to node)
+
+After scoring, scheduler sends an instruction to the API server:
+
+Bind pod → Node2
+
+Now Kubernetes starts the pod on Node2.
+
+Flow:
+
+Pod created
+      ↓
+Scheduler filtering
+      ↓
+Scheduler scoring
+      ↓
+Best node selected
+      ↓
+Pod bound to node
+      ↓
+Kubelet starts container
+4️⃣ Full scheduling flow
+
+Complete process:
+
+User creates pod
+        ↓
+API Server stores pod
+        ↓
+Scheduler notices unscheduled pod
+        ↓
+Filtering (remove invalid nodes)
+        ↓
+Scoring (rank remaining nodes)
+        ↓
+Select best node
+        ↓
+Binding
+        ↓
+Kubelet runs container
+5️⃣ Real debugging example
+
+When scheduling fails:
+
+kubectl describe pod mypod
+
+You might see:
+
+0/3 nodes are available:
+2 Insufficient cpu
+1 node(s) had taint
+
+Meaning:
+
+Filtering stage removed all nodes
+
+So pod remains Pending.
+
+6️⃣ Example with autoscaling
+
+Example cluster:
+
+Nodes = 3
+
+Traffic spike:
+
+Pods created = 10
+
+Scheduler tries to place pods:
+
+7 scheduled
+3 pending
+
+Cluster Autoscaler detects:
+
+Pending pods
+
+Then:
+
+New node created
+Scheduler retries
+Pods scheduled
+7️⃣ Why this knowledge is powerful
+
+In interviews, questions often include:
+
+• Why pods stay pending
+• How scheduler works
+• How Kubernetes distributes pods
+• How autoscaling interacts with scheduler
+
+If you understand Filtering → Scoring → Binding, you can answer all of these.
+
+💡 Since you're learning DevOps seriously, the next concept that will blow your mind is something most beginners don't know:
+
+Bin Packing vs Spread scheduling in Kubernetes.
+
+This explains:
+
+• Why sometimes Kubernetes fills one node first
+• Why sometimes it spreads pods across nodes
+• How companies reduce cloud cost using scheduler strategies.
+
+
+
+It uses algorithms like:
+
+LeastAllocated
+BalancedResourceAllocation
+TopologySpread
+
+So normally Kubernetes:
+
+Partially fills nodes
+while still spreading critical pods
+4️⃣ Pod Topology Spread Constraints
+
+Companies often configure pod spreading rules.
+
+Example:
+
+topologySpreadConstraints:
+- maxSkew: 1
+  topologyKey: kubernetes.io/hostname
+  whenUnsatisfiable: DoNotSchedule
+  labelSelector:
+    matchLabels:
+      app: swiggy
+
+Meaning:
+
+Pods must be evenly spread across nodes
+
+Example result:
+
+Node1 → 2 pods
+Node2 → 2 pods
+Node3 → 2 pods
+5️⃣ Real production example
+
+Example e-commerce system:
+
+Frontend pods = spread across nodes
+Background workers = bin packed
+
+Reason:
+
+Frontend → high availability needed
+Workers → cost optimization
+6️⃣ How companies reduce cloud cost
+
+Companies use bin packing + autoscaling.
+
+Example cluster:
+
+Node capacity = 10 pods
+Pods running = 12
+
+Scheduler packs pods:
+
+Node1 → 10 pods
+Node2 → 2 pods
+Node3 → 0 pods
+
+Cluster autoscaler sees:
+
+Node3 unused
+
+So it removes node3.
+
+Result:
+
+Less AWS cost
+
+Large companies save millions of dollars using this.
+
+7️⃣ Real production scaling flow
+Traffic increases
+        ↓
+Pods increase (HPA)
+        ↓
+Scheduler packs pods efficiently
+        ↓
+Nodes used optimally
+        ↓
+Cluster autoscaler adds/removes nodes
+8️⃣ Real DevOps interview question
+
+Interviewers may ask:
+
+Why did Kubernetes place multiple pods on the same node?
+
+Correct explanation:
+
+Scheduler scoring preferred that node
+due to resource availability and bin packing strategy
+
+✅ Pavan, if you understand everything we discussed today, you already know around 70% of Kubernetes scheduling and autoscaling behavior.
+
+But there is one advanced concept that makes Kubernetes architecture fully clear:
+
+How HPA actually calculates scaling using CPU metrics (metrics-server pipeline).
+
+That explains:
+
+Pod CPU → metrics-server → HPA controller → scaling decision
+
+Once you understand that, autoscaling behavior becomes crystal clear.
+
+
+
+PRODUCTION LEVEL DEPLOYMENT :
+
+-> create a ec2 instance and install the git , Jenkins , docker , kubectl ,kops 
+
+-> write the docker files and deployment files and service.yml files in git hub indiduval repositories.
+
+-> login to Jenkins and write the pipeline for every micro service 
+
+pipeline steps :
+1) git clone 
+
+2) build docker file 
+
+3) push image to registry
+
+4) kubectl create -f deployment.yml or kubectl create -f k8's/
+
+
+write for each and very micro service and pipeline 
+
+
+frontend/deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+
+spec:
+  replicas: 3
+
+  selector:
+    matchLabels:
+      app: frontend
+
+  template:
+    metadata:
+      labels:
+        app: frontend
+
+    spec:
+      containers:
+      - name: frontend
+        image: company/frontend:v1
+
+        ports:
+        - containerPort: 80
+
+This creates:
+
+frontend-pod-1
+frontend-pod-2
+frontend-pod-3
+
+
+
+
+frontend/service.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+
+spec:
+  selector:
+    app: frontend
+
+  ports:
+  - port: 80
+    targetPort: 80
+
+  type: ClusterIP
+
+
+5️⃣ Recharge Deployment
+
+recharge/deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recharge-deployment
+
+spec:
+  replicas: 3
+
+  selector:
+    matchLabels:
+      app: recharge
+
+  template:
+    metadata:
+      labels:
+        app: recharge
+
+    spec:
+      containers:
+      - name: recharge
+        image: company/recharge-service:v1
+
+        ports:
+        - containerPort: 3000
+6️⃣ Recharge Service
+
+recharge/service.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: recharge-service
+
+spec:
+  selector:
+    app: recharge
+
+  ports:
+  - port: 80
+    targetPort: 3000
+
+  type: ClusterIP
+
+
+
+
+
+
+
+
+7️⃣ Movie Deployment
+
+movie/deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movie-deployment
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: movie
+
+  template:
+    metadata:
+      labels:
+        app: movie
+
+    spec:
+      containers:
+      - name: movie
+        image: company/movie-service:v1
+
+        ports:
+        - containerPort: 3000
+8️⃣ Movie Service
+
+movie/service.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: movie-service
+
+spec:
+  selector:
+    app: movie
+
+  ports:
+  - port: 80
+    targetPort: 3000
+
+  type: ClusterIP
+
+
+install the ingress controller :
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
+
+this creates the ingress-nginx-controller 
+
+Service Type : Load Balancer 
+
+
+
+
+🔟 Ingress Configuration
+
+Create file:
+
+ingress/ingress.yaml
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+
+metadata:
+  name: app-ingress
+
+spec:
+  ingressClassName: nginx
+
+  rules:
+  - host: app.example.com
+
+    http:
+      paths:
+
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 80
+
+      - path: /recharge
+        pathType: Prefix
+        backend:
+          service:
+            name: recharge-service
+            port:
+              number: 80
+
+      - path: /movies
+        pathType: Prefix
+        backend:
+          service:
+            name: movie-service
+            port:
+              number: 80
+
+Routing result:
+
+app.example.com → frontend
+app.example.com/recharge → recharge service
+app.example.com/movies → movie service
+
+
+
+1️⃣1️⃣ Deploy everything
+
+Run commands:
+
+Deploy frontend
+
+kubectl apply -f k8s/frontend/
+
+Deploy recharge
+
+kubectl apply -f k8s/recharge/
+
+Deploy movie
+
+kubectl apply -f k8s/movie/
+
+Deploy ingress
+
+kubectl apply -f k8s/ingress/ 
+
+
+
+
+INCREASE LOAD :
+
+kubectl run load-generator --image=busybox -it --rm -- /bin/sh
+
+
+DELETE THE CLUSTER :
+kops delete cluster --name loginpage.k8s.local --yes
+aws s3 rb s3://pavanloginpagerepobucket --force
+
+
+
+ 
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+  
+ 
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

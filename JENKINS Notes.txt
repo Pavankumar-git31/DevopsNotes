@@ -1,0 +1,265 @@
+Jenkins : i have 4 enviornments dev, qa,uat,prod 
+i have the 4 var files 
+im confusing the whic var file i have to deploy on which env
+then i need to use the choice parameter
+
+
+Paramaters :
+choice : when we have a multiple options we can select one 
+create a CI job and--> configure --> This Project is Parameterized --> 
+choice --> name :env
+choice : dev ,test, Uat , prod --> save 
+
+
+String Parameter:
+with help of string parameters we can pass multiple parameters
+multi line string : passing inputs in multiple lines 
+boolean : true or false
+
+
+
+HOW TO CHANGE THE JENKINS PORT NUMBER :
+in command : vim /usr/lib/systemd/system/jenkins.service 
+ go to line 67 change the port number 
+systemctl daemon-reload
+systemctl restart jenkins.service  
+systemctl status jenkins.service
+
+
+
+HOW TO LOGIN WITHOUT USERNAME AND PASSWORD IN JENKINS :
+vim/var/lib/jenkins/config.xml
+in line number 7 remove the true in UseSecurity tags .
+restart the Jenkins 
+
+
+HOW TO BUILD 5 TIMES AT A TIME :
+configure --> execute concurrent builds --> save 
+click build three times at a time the at  time 3 builds are building 
+by default Jenkins gave you two builds we have to extend that builds 
+dashboard --> manage Jenkins --> nodes --> buit in node --> configuration --> no of executers make 5 --> save 
+when we try to build more 3-4 builds at a time the Jenkins server will may be crash 
+how to resolve : stop the server in aws and again start the server 
+Note : when you stop the server and again start the server the server ip address is going to change 
+when we stop the server the service inside the server is also stopped we have to start the Jenkins service then only we have to login in Jenkins server 
+
+
+HOW TO RESTRICT THE DELETED PROJECT ACCIDIENTALLY
+in the dashboard the projects is appear when we you want to build by clicking the dropdown symbol on project but unfortunately you click on delete
+ in that we have to restrict that 
+HOW?
+click on dashboard --> Manage Jenkins  --> plugins --> available plugins -- > search --> history --> job configuration history --> check and install --> go back to top page 
+now try to delete a job after that do this :
+dashboard --> click on job config history --> show deleted jobs --> you can see the deleted one --> click on restore project 
+
+
+=====================================================================================
+CRON JOB : used to schedule the works on Jenkins
+cron syntax is used to work cron jobs
+cron syntax having * * * * *
+each star will have the spaces in between them 
+
+*	: represents minutes 
+*	: hours 
+*	: date 
+* 	: month
+*	: day (sun=0 ,1=mon)
+
+i want the build for 11:05 08-09-2025
+5 11 8 9 1 --> this is the cron syntax 
+
+4:45 pm 09-09-2023
+45 16 9 9 6
+
+go to Jenkins --> configure --> build periodically --> add syntax and save 
+Linux will follow the UTC time zone not Indian time zone 
+
+Limitations:
+will not check the code is changed or not 
+
+POLLSCM: it will build when the code is changed only 
+Note : no need to set the time limit 
+
+Create a CI job : Build Triggers --> Poll Scm --> * * * * * --> save 
+
+Limitation:
+you want build at 9 am . but developer changed the code at 7 am only --> time wastage is there 
+
+inorder to remove this time wastage we are going to use WEBHOOKS.
+
+WebHooks:
+it will trigger the build at the moment we commit the code  
+
+git hub --> repo --> settings --> webhooks --> add webhook
+PayloadUrl : Jenkins server ip_adress:8080/github-webhook/
+content type : application/json --> add webhook
+
+jenkinsDashboard --> create CI job --> configure --> Build triggers --> Git hub hook triggers --> save 
+
+
+THROTTLE BUILD: : 
+it restricts the no of builds per hour 
+because if you click the build no of times the Jenkins server will crash again we have to trouble shoot that 
+in order to restrict we have to use the throttle build 
+
+configure --> throttle builds --> enter 3 builds --> select hours  --> save (the time difference between have to be 20 minutes)
+
+
+WE CAN BUILD REMOTELY:
+configure --> build triggers --> give token name --> copy the url and paste on browser --> replace token name --> add Jenkins url--> enter tab the build will be happen.
+
+
+JENKINS MASTER AND SLAVE :
+when we click on the multiple builds on the master node the Jenkins server might be crash. in real time we have to the multiple builds so the in order to avoid on the load on the master node we created on slave node to helps to take that build load on master. so nothing but master is the main node the slave which took the builds to do not crash the master server.
+
+How to create the slave node :
+create a ec2 instance and install the maven and java version -8 . because in order to build the project we need the maven. after that. we have to install the java 11. because agent slave is the agent to do master builds. so agent supports the java11 only.
+after installing the java 11. 
+go to Jenkins master dashboard --> Manage Jenkins --> nodes --> built in node --> new node --> give the name for the new node --> number of executors (as you need ) --> remote/root directory /tmp --> host --> use private ip address salve1 for kind select the username with keypair  and enter user name and click on enter directly --> add the key pair and save and --> add the key pair --> select the option build only when label matches the node --> select the last options for all the drop downs --> enter label name --> save.
+
+after that go to the job --> click on configure --> go to --> restrict where this project can be run --> add label
+
+automatically when you click on the build the war file is going to store in the /tmp folder in slave server.
+
+
+
+Note: if you stop and start the server the Jenkins service is stopped by default we have to start the Jenkins manually in order to stop that one one command is there 
+command : chkconfig Jenkins on 
+
+
+
+PIPELINE:
+step by step execution of the particular process
+or 
+series of events interlinked with each other 
+code --> build --> test --> deploy 
+pipe lines are syntax based
+it is domain specific language(DLS)
+we use groovy language to write the pipeline 
+it gives the visualization of a process execution (free style will not give visualization)
+TYPES OF PIPELINE:
+1.SCRIPTED
+2.DECLARATIVE(high priority) --> it gives a lot of flexibility
+
+DECLARATIVE(in real time mostly used) :
+to write the pipelines : to create a pipeline first 
+go to Jenkins dashboard --> new item --> pipeline --> write the script 
+pipeline{
+     agent any
+	stages{
+	   stage('one){
+	     steps{
+		sh 'touch file1'
+		}
+	     }
+	}
+    }
+
+
+if you want to give the clean package command we have to first integrate with the git for that 
+we have to select the pipeline syntax 
+click on pipeline syntax --> sample step --> git --> paste the repo link and --> click on generate pipeline script.
+
+PIPELINE AS A CODE :
+executing the multiple commands and multiple actions on a single stage --> write the all the code in single stage 
+
+PIPELINE AS CODE AS A SINGLE SHELL:
+sh '''
+mvn compile
+mvn build 
+mvn test
+mvn clean package 
+'''
+
+when ever we are executing the pipeline we need to check the code quality:
+to check the code quality we use SONARQUBE
+it checks the code quality
+it covers the bugs , vulnerability , code duplication and code smells 
+port no :9000
+req : t2 medium 
+dependency : java11
+it supports 20+ programming languages.
+
+downloading the SonarQube in  Linux :
+cd /opt
+sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-9.9.3.79811.zip
+unzip sonarqube-9.9.3.79811.zip
+yum install java-17-amazon-corretto -y
+user add sonar 
+chown sonar : sonar sonarqube-9.9.3.79811.zip
+chmod 777 sonarqube-9.9.3.79811 -R
+su sonar 
+
+
+
+only we have to run the command manually:
+sh/opt/sonarqube-9.9.3.79811/bin/Linux/sonar.sh start
+
+after login to sonar cube with ip_addr: port number(9000)
+username : admin
+password : admin
+create a new password 
+click add project --> manuallu --> give project key(name)--> setup 
+token(project key) --> generate token --> continue --> maven --> copy the commands 
+  i want to check the quality of the code before artifact 
+create one stage above the artifact and paste the sh code for multiple lines 
+after copying the commands --> go to pipeline --> and paste on the stage 
+click save and build the pipeline --> after completing the build check the code quality in the SonarQube 
+
+to execute the pipeline on slave server :
+pipeline{
+	agent{
+	     label 'slave1'
+	    }
+	}
+
+
+
+
+
+POST BUILD ACTIONS:
+post build actions is nothing but the actions you want to perform after the build 
+always : if fail or succeed it will trigger
+success : it runs only if build is succeed 
+always, changed, fixed, regression, aborted, success, unsuccessful, unstable, failure, notBuilt, cleanup
+
+
+
+RBAC:ROLE BASED ACCESS CONTROL
+in real time we restrict the access for Jenkins console.
+in rbac we can give set of limited permissions for the user 
+1.create user --> manage Jenkins --> users --> create user(Ramesh, suresh)
+2.download plugin
+dashboard --> Jenkins --> plugins --> available plugins --> type role (Role Based Autorization Strategy) --> install the plugin
+
+3. configure 
+click --> go back to top page --> manage Jenkins --> Security --> Authorization(Role based strategy) --> save 
+
+4.manage and assign roles 
+dashboard --> manage Jenkins --> Manage and assign roles (fresher , exp )--> add the roles --> give perm as per check boxes 
+
+5. Attach role to user :
+click -- save --> assign roles --> add user --> ramesh--> check(fresher) --> add user --> suresh --> check(exp) --> save 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

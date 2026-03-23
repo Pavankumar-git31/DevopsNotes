@@ -1,0 +1,38 @@
+#!/bin/bash
+
+echo "===== Jenkins Installation Started ====="
+
+# Update system
+yum update -y
+
+# Install required packages
+yum install -y git maven wget
+
+# Install Java 11 (Recommended for Jenkins)
+yum install -y java-11-amazon-corretto
+
+# Set Java 11 as default
+alternatives --set java /usr/lib/jvm/java-11-amazon-corretto/bin/java
+
+# Verify Java
+java -version
+
+# Add Jenkins repository
+wget -O /etc/yum.repos.d/jenkins.repo \
+https://pkg.jenkins.io/rpm-stable/jenkins.repo
+
+# Import Jenkins GPG key
+rpm --import https://pkg.jenkins.io/rpm-stable/jenkins.io-2023.key
+
+# Install Jenkins
+yum install -y jenkins
+
+# Start and enable Jenkins
+systemctl start jenkins
+systemctl enable jenkins
+
+# Verify Jenkins service
+systemctl is-active jenkins
+
+echo "===== Jenkins Installation Completed ====="
+echo "Access Jenkins on: http://<server-ip>:8080"

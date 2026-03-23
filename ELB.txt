@@ -1,0 +1,18 @@
+ELB:
+
+Load Balancer = Gate of the city
+Kubernetes Nodes = Buildings
+Pods = People inside buildings
+
+5️⃣ Real Production Flow (Netflix / Amazon style)
+Internet
+   ↓
+Cloud Load Balancer (AWS ELB)
+   ↓
+Kubernetes Ingress Controller
+   ↓
+Kubernetes Service
+   ↓
+Pods
+
+

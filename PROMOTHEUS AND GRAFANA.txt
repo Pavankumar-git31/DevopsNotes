@@ -1,0 +1,84 @@
+PROMOTHEUS AND GRAFANA : these are used to monitor the servers
+
+PROMOTHEUS : it is used to show the metrics.
+
+GRAFANA : it is used to visualize the promotheus
+
+
+PROMOTHEUS :
+1) promotheus is an opensource monitoring system that is especially well suited for cloud native environments like Kubernetes.
+2) it can monitor the performance of your applications and services.
+3) it can send the alerts if there any issues.
+4) it has a powerful query language that allows you to analyze the data.
+5) it pulls the real time metrics , compresses and stores it time-series in database.
+6) promotheus is a stand alone system, but it can also be used in conjunction with other tools like Alert manager to send alerts based on data it collects.
+7) it can be integration with tools like PagerDuty to send alerts to the appropriate on-call personal.
+8) it collects and also have the rich set of integration with other tools and systems.
+9) for example you can use promotheus to monitor the health of the Kubernetes clusters , and use its integration with Grafana to visualize the data it collects.
+
+
+PROMOTHEUS : it is a monitoring system that consist of following components:
+1) main server that scrapes and stores time series data.
+2) A query language called PromQl is used to retrieve and analyze the data.
+3) a set of exporters that are used to collect metrics from various systems and applications.
+4) A set of alternating rules that can trigger notifications based on the data.
+5) An alert manager that handles the routing and suppression of alerts.
+
+
+9090 : Prometheus 
+
+9100 : Node Exporter 
+
+3000: Grafana
+
+
+install the Prometheus , Grafana , Node Exporter.
+
+
+public_ip_adress:9090   -> Prometheus interface will open 
+
+
+up : it will show the current running 
+process_virtual_memory_bytes : it will give the how many bytes took by promo , nodeexpo 
+process_cpu_seconds_total   : it will give the cpu consumption.
+
+if you want to check the server is running or not 
+
+status --> targets --> up/down
+
+
+
+HOW TO INTEGRATE THE GRAFANA WITH PROMETEUS  :
+
+Grafana --> add data source --> Prometheus --> Prometheus server url --> save and test --> explore data 
+
+click on three lines left side --> dashboards --> new --> import dashboard --> 1860(to see the cpu and memory information) --> load --> import
+
+if you want to increase the load :
+
+amazon-linux-extras install epel -y
+
+stress --cpu 1 --io 1 --vm-bytes 128MB --timeout 30s 
+
+for next 30 sec it will increase the stress on server. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,912 @@
+TERRAFORM :
+in real time when we set up the infrastructure for one client. in another month another client is there so lot of time wastage is there or creating for each client. so we need to automate with the terraform.
+
+INFRASTRUCTURE :-
+resources used to run application on cloud.
+ex: ec2 , s3 , elb , vpc 
+
+in general we used deploy infra manually 
+
+manual:
+-> time consumption
+-> manual work.
+-> commiting mistakes.
+
+Automate --> Terraform --> code --> hcl (Hashicrop configuration language)
+
+Terraform :
+
+it is a tool used to make infrastructure automation.
+it is a free and opensource.
+it is a platform independent.
+it is comes on year 2014.
+who: Mitchel hasimoto 
+owned: hashicorp 
+terraform is written on go language.
+we can call terraform as IAAC TOOL.
+
+HOW IT WORKS :
+terraform uses code to automate the infra.
+we use HCL : Hashicorp Configuration Language.
+
+IAAC : infrastructure as a code.
+
+code --> executes --> infra 
+
+ADVANTAGES :
+-> Reusable 
+-> Time Saving 
+-> Automation
+-> Avoiding Mistakes
+-> Dry Run
+
+NOTE : if we want to create the infrastructure automatically on AWS we have the service called CFT ( cloud formation template)
+
+AZURE : ARM templates.
+
+GOOGLE : GDE (google deploy engine) template
+
+to work on different cloud platforms we need to learn those things. but in terraform if we learn we can work on any services without learning them.
+
+
+TERRAFORM = ALL CLOUD
+
+NOTE : like kops is a third party tool if third party tool want to access our aws console we need to give the access key and secret key.
+like wise terraform is also same way.
+
+after creating access key and secret key in IAM 
+
+aws configure 
+
+access key 
+
+secret key 
+
+ap-south-1
+
+table 
+
+
+go to browser type terraform install click first link and select the Linux and Amazon Linux 
+copy and paste the three commands.
+
+-> after installing create a separate folder mkdir terraform
+-> cd terraform
+
+TERRAFORM FILE WRITING :
+
+vim main.tf
+
+provider "aws" {
+region = "us-east-1"
+}
+
+resource "aws_instance" "one"{
+ami = "ami=383yr2uy28"
+instance_type = "t2.micro"
+}
+
+:wq
+
+
+TERRAFORM COMMANDS :
+terraform init : it will initialize the provider plugins form backend.
+terraform plan : it will read the configure file and plan the execution.
+terraform apply : to create the resources. /yes
+terraform destroy : it will destroy all the resources in that file /yes
+
+
+NOTE : if we create a resources with terraform it will track the resources .
+ll
+car terraform.tfstate : the complete information about the resources will be here.
+
+if i want 5 instances.
+
+vim main.tf
+
+provider "aws" {
+region = "us-east-1"
+}
+
+resource "aws_instance" "one"{
+count = 5
+ami = "ami=383yr2uy28"
+instance_type = "t2.micro"
+}
+
+:wq
+
+terraform plan 
+terraform apply
+
+
+terraform state list : list the all resources 
+
+if i want to delete among one of the resource. ( terraform destroy -target="aws_instance_one[4]")
+
+deleting two resources :
+
+terraform destroy --auto-approve -target="aws_one[0]" -target="aws_one[1]" 
+
+
+
+
+STATE FILE : used to store the resource information which is created by the terraform.
+to track the resource activities.
+in real time entire resource info is in state file.
+we need to keep it safe.
+if we lost this file we cant track the infra.
+Command:
+terraform state list.
+
+terraform target :
+used to destroy the specific resource.
+terraform state list 
+
+
+TERRAFROM VARIABLES :
+
+vim main.tf
+
+provider "aws" {
+region = "us-east-1"
+}
+
+resource "aws_instance" "one"{
+count = var.instance_count
+ami = "ami=383yr2uy28"
+instance_type = var.instance_type
+}
+
+variable "instance_type"{
+description = "*"
+type = string
+default = "t2.micro"
+}
+
+variable "instance_count"{
+description = "*"
+type = number
+default = 5
+}
+
+:wq
+
+
+
+TERRAFORM VAR FILES :
+these files used to store variables separately on terraform
+
+vim main.tf
+
+provider "aws"{
+region = "ap-south-1"
+}
+
+resource "aws_instance" "one"{
+count = var.instance_count
+ami = "ami-26483r389i"
+instance_type = var.instance_type
+tags{
+Name = "pavan-server"
+}
+}
+
+:wq
+
+vim variable.tf
+
+variable "instance_count"{
+description = "*"
+type = number
+default = 3
+}
+
+
+variable "instance_type"{
+description = "*"
+type = string
+default = t2.micro
+}
+
+:wq
+
+
+
+
+HOW TO CHANGE THE CEEDIENTIALS :
+for example i deleted the user in ami so now access and security keys will not work so we need to change the credentials for new user.
+
+cd  --> it will go to root path
+ls -al   --> search for .aws (all aws cred is going to store on .aws)
+ll .aws/
+config
+credentials
+
+vim .aws/credentials
+
+then change the new keys 
+
+
+
+
+
+terraform plan 
+
+terraform apply --auto-approve 
+
+
+
+NOTE :
+for example i have two enviornments test and dev
+for dev i want 1 server and type is t2,micro
+for test i want 2 server and type is t2.medium
+
+so i need to edit the variable.tf file for different enviornmants 
+instead of that i will write the dev.tfvars and test.tf vars 
+
+like this :
+
+vim variable.tf
+
+variable "instance_count"{
+}
+
+variable "instance_type"{
+}
+:wq
+
+
+
+
+
+vim dev.tfvars
+
+instance_count = 1
+
+instance_type = "t2.micro"
+
+
+
+vim test.tfvars
+
+instance_count = 2
+
+instance_type = "2.medium"
+
+
+WORKING :
+
+first main.tf execute and check the variables on local if it is there it is okay if not it will check the variable.tf file if it is not there it will check the .tfvars so we have no of .tfvars so we need to specify that .tfvars in the command 
+
+terraform plan
+terraform apply --auto-approve -var-file="test.tfvars"
+terraform destroy --auto-approve -var-file="test.tfvars"
+
+
+
+
+
+
+TERRAFORM CLI :
+we can pass inputs for terraform from cli
+
+vim main.tf
+
+provider "aws"{
+region  = "ap=south-1"
+}
+
+resource "aws_instance"{
+ami = "ami-akiuregqir"
+type = var.instance_type
+}
+
+variable "instance_type"{
+}
+
+terraform apply --auto-approve 
+Enter a value: t2.micro
+
+another method :
+terraform apply --auto-approve -var="instance_type=t2.medium"
+
+
+
+TERRAFORM OUTPUTS :
+here we are creating the resources so resource having lot of information like private ip address and public ip address , dns --etc. so whenever we want to print the resource information in that case we are going to use the terraform outputs 
+
+HOW TO WRITE THE OUPTUT BLOCK :
+
+vim main.tf
+
+provider "aws"{
+region = "ap-south-1"
+}
+
+resource "instance_type" "one"{
+ami = "ami-mehrgqkjwf"
+type = "t2.medium"
+tags = {
+Name = "pavan"
+}
+}
+
+output "pavan"{
+value = aws_instance.one.public_ip
+}
+
+terraform apply --auto-approve  : now it will show the public ip address of the resource
+
+multiple values :
+output "pavan"{
+value = [aws_instance.one.public_ip, aws_instance.one.private_ip]
+}
+
+the moment when you give the terraform apply auto-approve it will not create the new server the resource block will not execute because it is already there so it will execute the changed output clock now it will print the private and public ip addresses.
+
+
+
+
+
+TERRAFORM IMPORT :
+used to import and track the resources which is created manually.
+
+for example when you created the server with terraform it is going to track the server information. if you create a server manually is terraform is going to track the info of the server? 
+
+so if i created a server manually and i want to store the information on terraform in that case we are going to use the terraform import.
+
+
+STEPS :
+-> create a server manually
+-> copy the instance id 
+-> terraform import aws_instance.one paste the server id
+-> cat terraform.tfstate (now it will track the server )
+
+NOTE : get the full info of commands terraform -import --help / -h
+
+
+
+CREATING S3 BUCKET , EBS VOLUME 
+
+vim main.tf
+
+provider "aws"{
+region = "us-east-1"
+}
+
+resource "aws_s3_bucket" "one"{
+bucket = "pavans3bucketinnotepad"
+}
+
+resource "aws_ebs_volume" "two"{
+size = 20
+avaliability_zone = "us-east-1b"
+tags = {
+Name = "pavan-ebs"
+}
+} 
+
+resource "aws_iam_user" "three"{
+name = "pavan-2"
+}
+
+:wq
+
+
+
+
+
+TERRAFORM TAINT :
+used to re create a specific objects. 
+in real time some resources we need to recreate if it will not work properly 
+then we can use the taint concept.
+
+
+vim main.tf
+
+provider "aws"{
+region = "us-east-1"
+}
+
+resource "aws_s3_bucket" "one"{
+bucket = "pavans3bucketinnotepad"
+}
+
+resource "aws_ebs_volume" "two"{
+size = 20
+avaliability_zone = "us-east-1b"
+tags = {
+Name = "pavan-ebs"
+}
+} 
+
+resource "aws_iam_user" "three"{
+name = "pavan-2"
+}
+
+resource "aws_instance" "four"{
+ami = "ami-3786847hjsmbfn"
+instance_type = "t2.micro"
+tags = {
+Name = "pavan-server"
+}
+}
+
+
+Assume in the above services the one service is not working properly and that service is aws_instance and label is four 
+
+terraform taint aws_instance.four
+
+terraform apply --auto-approve
+
+the moment i apply the terraform the aws_instance.four will destroy and recreate again.
+
+
+
+TERRAFORM LIFECYCLE :
+
+for example i want to prevent destroy for certain resources i will use the terraform life cycle.
+
+
+vim main.tf
+
+provider "aws"{
+region = "us-east-1"
+}
+
+resource "aws_s3_bucket" "one"{
+bucket = "pavans3bucketinnotepad"
+}
+
+resource "aws_ebs_volume" "two"{
+size = 20
+avaliability_zone = "us-east-1b"
+tags = {
+Name = "pavan-ebs"
+}
+} 
+
+resource "aws_iam_user" "three"{
+name = "pavan-2"
+}
+
+resource "aws_instance" "four"{
+ami = "ami-3786847hjsmbfn"
+instance_type = "t2.micro"
+tags = {
+Name = "pavan-server"
+}
+
+lifecycle{
+prevent_destroy = true
+}
+}
+:wq
+
+
+Prevent_destroy : used to secure our resources.
+
+
+
+
+
+
+TERRAFORM FMT:
+when we write the terraform file there is indentations mistakes in that case we have to give the commands 
+terraform fmt 
+cat main.tf
+
+
+
+
+
+
+
+
+VERSION CONSTRAINT :
+used to change the provider version.
+
+steps :
+-> got to browser --> type terraform aws provider version --> click the very first link --> in version select the version --> click on use provider --> copy the block and paste in the main.tf file.
+
+terraform init -upgrade
+
+we can give the less than and grater than values as well ">5.19.0"
+
+
+CREATING THE LOCAL FILE :
+
+vim main.tf
+
+provider "aws"{
+region = "us-east-1"
+}
+
+resource "local_file" "one"{
+filename = "abc.txt"
+content = "this file is created by the terraorm"
+}
+
+here we have to give the :  terraform init -upgrade 
+NOTE : if ypu give the terraform apply it is not going to work.
+then we need to give the 
+terraform apply --auto-approve 
+
+cd /root
+ll
+
+
+HOW TO UPDATE THE TERRAFORM LOCAL PROVIDER PLUGIN :
+ 
+browser --> terraform local provider --> use provider --> copy the code --> paste in to the main.tf
+
+terraform init -upgrade
+
+
+
+
+
+
+TERRAFORM LOCALS :
+its a block used to define the values.
+we can define the value once and use multiple times.
+
+VPC AND SUBNETS :
+
+vim main.tf
+
+provider "aws"{
+region = "ap-south-1"
+}
+
+locals {
+env = "dev"
+}
+
+resource "aws_vpc" "one"{
+cidr_block = "10.0.0.0/16"
+tags = {
+Name = "${local.env}-vpc"
+}
+}
+
+resource "aws_subnet" "two"{
+cidr_block = "10.0.1.0/16"
+vpc_id = aws_vpc.one.id
+tags = {
+Name = "${local.env}-subnet"
+}
+}
+
+resource "aws_instance" "three"{
+ami = "ami-765234723uyegf"
+instance_type = "t2.micro"
+subnet_id = aws_subnet.two.id
+tags = {
+Name = "${local.env}-server"
+}
+}
+
+:wq
+
+terraform init 
+terraform validate / terraform plan 
+terraform validate = it is to validate the syntax errors in code.
+
+
+NOTE : for example i execute the main.tf the dev env is created . after that i changed local env to test then it is going to update dev to test it is not creating again it is just updating. for that purpose we are going to use the terraform workspace.
+
+
+TERRAFROM WORKSPACE :
+WORKSPACE : where we write the code and execute the operations.
+it is used to isolate the environments.
+in real time all the works we do on workspaces only.
+if we perform an operation on dev workspace it wont effect another workspace.
+
+COMMANDS :
+i want to see the workspaces 	: terraform workspace list 
+create a new workspace 		: terraform workspace new dev
+to show the all workspaces 	: terraform workspace list
+to show current workspace	: terraform workspace show
+to switch the workspaces	: terraform workspace select prod
+to delete the workspace 	: terraform workspace delete prod
+
+now to switch to required workspace and need to change env in local according to that instead of that i will put the env = "${terraform.workspace}"
+now it will directly take the current env name 
+
+NOTES :
+we cant delete the current workspace.
+we cant delete our workspace without deleting the resources in that workspace.
+we cant delete the default workspace.
+
+
+TERRAFORM GRAPH : used to show the flow chart of the infra.
+terraform graph 
+paste the content in graphviz online.
+
+
+
+
+
+TERRAFORM ALIAS AND PROVIDER :
+if i want to use the same main.tf file and i want to create the infra on two different regions at the same time i will use alias and provider.
+
+vim main.tf
+
+provider "aws" {
+region  = "ap-south-1"
+}
+
+resource "aws_instance" "one"{
+ami = "ami-7645ytfutdr6"
+instance_type = "t2.micro"
+type = {
+Name = "mumbai-server"
+}
+}
+
+
+
+provider "aws" {
+region  = "ap-northeast-1"
+alias = "tokyo"
+}
+
+resource "aws_instance" "one"{
+provider = aws.tokyo
+ami = "ami-7645ytfutdr6"
+instance_type = "t2.micro"
+type = {
+Name = "mumbai-server"
+}
+}
+
+
+TERRAFORM LIFE CYCLE :
+Prevent Destroy = it will not delete the resources.
+ignore changes = it will not replicate the changes which done to server.
+depends on  = it will depend on other resource to create (if i created s3 bucket i can make it depends 
+              like if s3 bucket is created then only the ec2 server will create)
+
+
+
+
+NOTE : for example my all resource information is going to store on .tfstate file unfortunately my state file is deleted in that case it is very risky. for that purpose i will store my state file in backup in remote location. that is called remote backend setup.
+
+
+S3 REMOTE BACKEND SETUP :
+when we create infra the information of the state file will store in state file.
+so it will be tracking the infra information.
+so we need to take the backup of that file.
+if we lost that file we cant track the infra.
+so we prefer to locate the file in remote location.
+here iam using s3 as a remote backend.
+
+create a bucket manually.
+
+vim main.tf
+
+provider "aws"{
+region = "ap-southeast-1"
+}
+
+terraform {
+backend = "s3"{
+bucket = "terraformbackendstatefile007"
+key = "prod/terraform.tfstate"
+region = "ap-southeast-1"
+}
+}
+
+resource "aws_instance" "one"{
+ami = "ami-5467ufchhgu5rtu"
+instance_type = "t2.micro"
+tags = {
+Name = "pavan-server"
+}
+}
+
+NOTE : while using new provider block always we need to run the terraform init other wise the terraform plugins will not be download.
+
+after removing backend setup in main.tf we need to run the command 
+terraform init -migrate-state 
+
+because with code we established the connection. so after removing the code also we need to remove the connection 
+
+
+
+TERRAFORM REFRESH :
+for example i have one resource is ec2 instance suppose i terminated manually in aws console and i run command (terraform state list or cat terraform.tfstate) it will show because it is not refreshed we need to refresh
+
+terraform refresh
+
+
+
+
+
+DYNAMIC BLOCK :
+it is used to reduce the length of the code and used for reusability of the code in loop.
+
+
+
+for each:
+
+vim main.tf
+
+provider "aws_instance" "two"{
+for_each = toset(["web-server" , "app-server" , "db-server"])
+ami = "ami-45678tydfg"
+instance_type = "t2.micro"
+tags = {
+Name = "${each.key}"
+}
+}
+
+
+
+for each :
+vim main.tf
+
+provider "aws"{
+region = "ap-south-1"
+}
+
+resource "instance_type" "one"{
+count = length(var.instance_type)
+ami = "ami-uyejgriuwqrg"
+instance_type = var.instance_type[count.index]
+tags = {
+Name = var.instance_name[count.index]
+}
+}
+
+variable "instance_type"{
+default = ["t2.medium" , "t2.micro" , "t2.large"]
+}
+
+variable "instance_name" {
+default = ["app-server" , "web-server" , "db-server"]
+}
+
+
+THINGS NEED TO CONSIDER WHILE DEPLOYING :
+-> need to take the backups of the current builds and databases.
+-> need to provide the isolate environments for dev, test and prod
+-> can able to roll back if the deployment fails.
+-> make sure we are deploying the correct env and client application servers.
+
+
+DEPLOYMENT STARTEGIES :
+
+BLUE GREEN DEPLOYMENT :
+if i have to deploy the new version i will create a new servers and deployed the app and i will detach the old servers from old server and attach new servers.
+
+ROLLING STRATEGIES :
+we are going to create new servers parallel we are removing the old servers.
+old code and new code must be running on same time in parallel environment that is old environment and new environment.
+
+CANARY DEPLOYMENT :
+first i will redirect the 30 % of users to new code and then if every thing works fine then i will redirect all users to new code.
+
+RECREATE STRATEGY :
+we need to down the all servers and we need to deploy the new version then we need to bring the services in to running state.
+
+A/B DEPLOYMENT :
+we will use the two ports here one port is old code and new code is another code . first we will redirect the some users to both ports which one is working fine based on that we will redirect the whole traffic.
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

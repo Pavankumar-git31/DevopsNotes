@@ -1,0 +1,139 @@
+S3 BUCKETS :
+
+S3 : Simple Storage Service 
+
+-> it is highly scalable , Securable , Durable to store the data.
+-> it is a object level storage type.
+-> Easy to store and retrieve data.
+-> Object based storage and data is spread multiple regions.
+-> Customers of all sizes and industries can use Amazon S3 to store and protect any amount of data for a range of use case , such as data lakes , websites , mobile applications , backup and restore , archive , enterprise applications , IOT devices , and big data analytics.
+
+Bucket = object = File/ Folder/ Image/ Audio
+
+
+BUCKETS  :
+-> If you create a root level folder then it is called as a buckets.
+-> used to store objects.
+-> Bucket owner ship is not transferable to another account.
+-> After you create a bucket you cant change its name or region
+-> we cannot delete the bucket directly first we need to make it empty it first.
+-> After a bucket is deleted , the name become available for reuse.
+-> the files which are stored in S3 from 0 Bytes to 5TB
+-> By default we can create a 100 buckets in AWS account.
+-> if you need additional buckets you can increase the limit to a maximum of the 1000 buckets by submitting a service limit increase.
+
+
+OBJECTS :
+-> files/folders/images/videos/audio you stored in bucket is called as Objects.
+-> bucket is a container for objects.
+-> an object is a file and any metadata that describes that file.
+-> with Amazon S3 you pay only for what you use.
+
+TYPES OF UPLOADING DATA IN TO S3 :
+-> uploading an object in a single operation using the AWS SDK's , REST API , or AWS CLI - with a single PUT operation , you can upload a single object up to 5GB in size.
+
+-> upload a single object using the S3 console - with the Amazon S3 console , you can upload a single object up to 160GB in size.
+
+-> upload an object in parts using the AWS SDK's REST API or AWS CLI - using the multipart upload API , you can upload single large object , up to 5TB in size.
+
+
+
+
+MAJOR COMPONENTS OF OBJECT :
+
+KEY		: NAME OF THE OBJECT 
+VALUE		: DATA IN BYTES
+VERSION ID	: SHOWS VERSIONING ID FOR UNIQUENESS OF OBJECT 
+META DATA 	: DATA ABOUT DATA WE ARE STORING 
+
+
+
+
+RULES TO CREATE A BUCKET :
+
+-> UNIQUE NAME 
+-> NAME SHOULD BE IN 3 TO 63 CHARACTERS 
+-> ONLY LOWER CASE IS VALID 
+-> SHOULD NOT BE IN IP FORMAT
+-> MUST BEGIN AND END WITH NUMBER OR LETTER 
+
+
+create a bucket :
+
+type s3 in aws console -> create s3 bucket --> name of bucket --> region --> ownership disable -->
+select server side encryption --> enable versioning --> create bucket --> upload files 
+
+we can upload all types of files in the s3 bucket 
+
+NOTE : for example you uploaded one file and you deleted in your file manager and you delete as well as in s3 bucket. at that time you can click show versioning and check that file and go to actions and download it . this is the importance of S3 versioning.
+
+S3 versioning : to retrieve the data which is removed from the bucket.
+
+NOTE : if you delete the object in versioning also in that case we cannot retrieve that.
+
+
+
+
+COPY THE OBJECTS FROM ONE BUCKET TO ANOTHER BUCKET :
+for suppose you created another bucket if you want to copy the objects from old bucket to new bucket 
+check the object --> actions --> copy --> browse --> click the s3 buckets --> select that bucket --> choose destination --> copy 
+
+
+
+HOW TO CALUCLATE THE TOTAL SIZE OF BUCKET :
+select the all objects --> actions --> calculate total size 
+
+
+
+if you forgot which object i uploaded lastly we can check like this double click on last modified column it will get on the top.
+
+double click on name we can see the objects in alphabetical series 
+
+size also same thing just double click 
+
+
+
+
+
+
+CROSS REGION REPLICATION :
+copy the object from one bucket to another bucket which are in different regions.
+for the every bucket the versioning must be enabled.
+for example i have a bucket one region and my client have bucket on another region . if i want to copy the files from my bucket to client bucket i can copy the manual way. if i add new files every time i need to add manual way of copying.
+if i add a file automatically the client bucket should have that object. in order to do that we will use the cross region replication 
+
+source bucket --> management --> create replication rule --> name (ex: rule-1) --> choose a rule scope (Apply to all objects in bucket ) --> Destination (choose a bucket in this account ) --> browse --> select the client bucket --> choose path --> IAM role --> create a new role --> save --> check the yes, replicate the existing objects --> submit --> click browse S3 --> select the destination bucket --> choose path --> save 
+
+
+STORAGE CLASSES :
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
