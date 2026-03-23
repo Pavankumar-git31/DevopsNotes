@@ -1,0 +1,40 @@
+DEVOPS INTERVIEW :
+
+1) git commands
+
+2) Jenkins pipeline (scripted / declarative ) multi staged pipeline 
+
+3) sonar Qube 
+
+4) Tomcat 
+
+5) Ansible playbooks
+
+6) docker file
+
+7) docker swarm 
+
+8) docker compose 
+
+9) Kubernetes architecture 
+
+10) Kubernetes services , deployment files 
+
+11) terraform 
+
+12) EBS
+
+13) S3
+
+14) IAM 
+
+15) VPC
+
+
+
+
+
+
+
+
+
