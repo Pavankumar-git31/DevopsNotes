@@ -1,0 +1,196 @@
+VPC :
+
+A virtual private cloud is a virtual network that closely resembles a traditional networking that you operate in your own data center , with benefits of using scalable infrastructure of AWS.
+
+VPC is a virtual network or datacenter inside AWS for client.
+
+WHY VPC ?
+the three main reasons we are using the vpc is security , privacy & prevention of loss of data.
+
+if we are not comfortable when we need to use a public network of a cloud service like AWS , in order to use their services , the VPC provides an extra layer of security so they can decide their own network. So here it gives only security but not privacy . when we launch an instance they will provide VPC by default , but in real time we need to customize our VPC for getting more security , privacy , and prevention of loss of data.
+
+
+
+FEATURES OF VPC 
+
+-> it is logically isolated from other virtual N/W in the AWS 
+-> we can create a 5 VPC's in each region and 200 subnets in 1 Account 
+-> we can allocate a max 5 elastic IP.
+-> once we create VPC , DHCP (dynamic host control protocol) , NACL (network access control list ) and security group will be automatically created.
+-> a VPC is confined to an AWS region and does not extend between regions.
+-> VPC's are always created in regions not in availability zones.
+-> once VPC is created you cannot change in CIDR block range.
+-> if you need a different CIDR size , create a new VPC.
+-> you can expand your VPC CIDR by adding a new / extra by adding new and extra IP addresses except for govt cloud AWS China.
+
+your IP address range is going to depend on CIDR range.
+
+
+TYPES OF VPC :
+1. DEFAULT VPC : create in each region when we create an AWS account. it has default CIDR, security group , NACL , internet gateway & Routing table settings.
+
+2. CUSTOM VPC : it is a kind of VPC created by the AWS account owner. AWS user creating the custom VPC cab decided on the CIDR. it has its own security groups , network ACL , and route table , it doesn't have any internet gateways , by default we need to create it if we needed.
+
+
+
+ARCHITECTURE :
+VPC architecture is very important if we understand the architecture then only we can able to work on real time. because when ever we are creating infrastructure the first thing we are going to create is VPC only . our AWS work starts with VPC only , without creating VPC we cannot work anything , the first component we are going to create in terms of infrastructure is VPC.
+
+in architecture we have three tier architecture or example iam taking a 2 tier architecture.
+web server : i want people to see the web server so i will place my web server on public subnet.
+App server : in app server code is there so i don't want people to see my code because i want security for that code. so i will place my app server on private subnet.
+
+TYPES OF SUBNETS :
+
+1) public subnet 
+2) private subnet 
+
+when ever we created a server on a private subnet we don't have public IP address.
+
+for in public subnet we have public IP address.
+
+NOTE : i will place my web server on public subnet and my application server i will place on private subnet . but the communication between the app server and web server is managed by the NAT gateway. NAT gateway is send the information from application server to web server. that means application is on private web is on public 
+
+so if i want to establish the connection between the private subnet and public subnet iam going to use the NAT gateway.
+
+INTERNET GATEWAY : for transferring the information from public subnet to internet is going to managed by the Internet gateway.
+
+ROUTE TABLE : it is nothing but database of your traffic. what ever the requests we are getting and incoming and outgoing requests responses is going to store in route table.
+
+
+COMPONENTS OF VPC :
+
+SUBNETS :
+it is a small part of your network. when ever we create a server on some availability zone then we are going to use some subnet.
+
+ROUTE TABLE : it is nothing but database of your traffic. what ever the requests we are getting and incoming and outgoing requests responses is going to store in route table.
+
+NAT GATWWAYS : 
+
+
+
+STEPS TO CREATE A VPC :
+
+1) create VPC --> VPC name (swiggy) --> ipv4 CIDR range (10.0.0.0/16) --> create VPC
+
+# create a public subnet and private subnet to attach to the web server and app server.
+
+2) subnets --> create subnet --> select the swiggy VPC --> subnet name (pub-subnet) --> select the any availability zone --> ipv4 VPC CIDR block (10.0.0.0/16) --> ipv4 subnet CIDR block (10.0.0.0/24) --> create subnet 
+
+create a two subnets pub-subnet & prv-subnet (10.0.0.1/24)
+
+
+for web server we use the public subnet for public subnet we have to use the internet gateway:
+
+3) click internet gateway --> create internet gateway --> name (swiggy-igw) --> create internet gateway
+
+we need to attach to the VPC
+
+4) actions --> attach the swiggy VPC --> attach internet gateway.
+
+5) routes --> create route table --> name (pub-rt) --> attach to Swiggy VPC --> create route table 
+
+here route table means the all in coming and outgoing traffic information is going to store in that so we need to give the traffic globally so we need to give the ALL traffic 
+
+6) edit routes --> Add route (0.0.0.0/0) --> internet gateway (because it is public subnet route table) --> next 
+
+
+we have to attach the public subnet to the route table
+
+7) subnet associations in route table --> edit subnet associations --> select the pub-subnet --> save 
+
+8) create a web server --> edit --> select the VPC swiggy --> subnet --> pub-subnet --> public ip (enable) --> launch instance
+
+9) install the apache and add index.html for accessing the app
+
+10) create a app ec2 instance and disable for public ip address and give the private subnet.
+
+
+NOTE : we will never expose the public ip address except for web server.
+
+now we cant connect to the app server.
+
+HOW TO CONNECT TO APP SERVER :
+
+1) connect to the web server 
+2) cmd : vim keypair_name.pem
+3) paste the pem file content.
+4) chmod +x keypair_name.pem 
+5) go to ssh client and copy an paste and enter 
+
+it will connect 
+
+
+11) click NAT gateway ->  name (swiggy-nat) --> select the pub-subnet --> connectivity type (public) --> allocate elastic ip --> create NAT gateway
+
+12) click route tables --> create route table --> name (app-rt) --> attach VPC --> edit routes --> give the all traffic --> give nat gateway --> save changes.
+
+13) route tables --> subnet associations --> edit subnet associations --> prv-subnet --> save associations.
+
+INTERVIEW QUESTION :
+tell me the difference between the ipv4 and ipv6 :
+
+ipv4 is a 32 bit 
+
+ipv6 is 128 bit 
+
+ipv4 we have . separation
+
+ipv6 have : separation
+
+ipv4 having numbers
+
+ipv6 having alpha and numbers 
+
+ipv4 is largely used 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
