@@ -1,0 +1,152 @@
+LINUX COMPLETE:
+
+root@ubuntu-dev:/#
+
+root = root is the admin user for the Linux
+
+/ = home directory for the file system
+
+ubuntu@hostname:~$ 
+
+ubuntu = it is the user gave you ec2 instance it will not give the direct root user for some security reasons.
+         if you want to go to the root user we need to enter command sudo su
+
+~ = /home/ubuntu
+
+FILE SYSTEM :
+
+ls -ltr    =  it will give the all files and folders and packages.
+
+
+
+1) sbin :
+-> here sbin is called system libraries
+-> basically system binaries is commands or binary files used to manage the system.
+
+2) lib :
+-> here lib is called the libraries 
+-> as a user we dont use this libraries these libraries is used by the Linux kernel
+
+3) boot :
+-> here these commands is used to start or restart the Linux machine we can see in ec2 instance.
+
+4) bin :
+-> there is slight difference between the sbin and bin that is bin stands for user binaries.
+-> these are not admin actions any one can access these commands. so inside bin commands is non administrative.
+
+5) srv :
+-> here srv is nothing but server 
+-> here in this we can store the configuration files or any imp info related to web server.
+
+6) opt :
+-> opt is a very imp folder in Linux.
+-> for example if you want to install the third party tools in Linux machine we will use the folder 
+
+7) mnt :
+-> here mnt means mount.
+-> for example in my machine i have 20 gb space and that is completely utilized i want to add more space in that case we will use this mount concept to mount the disk.
+
+8) media :
+-> it is just for adding the mp3 or mp4 files 
+
+9) var :
+-> it is used to store the log files or libraries.
+-> for example if you install the web server like apache the logs of the server is going to store i this var 
+
+10) home :
+-> for example you created a useradd pavan 
+-> ls /home you can see the two users ubuntu and pavan if you store personally in pavan not any one can be accessible because it having a password.
+
+11) data :
+-> we can put the any kind of data . or we can also put the data that are accessible to all the admins can see.
+
+
+12) proc , dev , sys , tmp 
+-> these are temporary folders where we can store the files that are not permanent.
+
+NOTE :
+for root user the home directory us /
+for any other user the home directory is /home/
+
+
+13) run :
+-> it will store the run time data of the processes.
+-> while process is running and having a run time data that data is going to store in run
+
+14) etc :
+-> it is one of the most important folder in the Linux system.
+-> it contains all the system config files like c drive in windows.
+-> using this files we can modify the system like settings in our mobile phone.
+
+which ls :
+when you give this command it will tell the path of ls 
+
+how it should know that ls is to list the files :
+when you type the ls it will refer the PATH in that path if ls is there it will execute the command 
+
+$PATH : it will show the paths that machine will check when we give the command.
+
+
+USER MANAGEMENT :
+useradd pavan
+to check the user : vim /ect/passwd/
+to set password   : passwd pavan
+to check 	  : cat /ect/shadow
+
+to delete the user  : userdel pavan
+to check 	    : cat /etc/passwd
+
+to add user for better info about user and with that we can create a home directory as well 
+
+adduser pavan 
+give the info
+check : ls /home
+
+how to switch to user : su - pavan
+
+
+1) what is the difference between useradd and adduser :
+-> both of these commands done the same thing but adduser creates /home directory for user and it also takes all the user information. then useradd is quick way of creating the user and it will not ask the user info and doesnot create the home directory.
+
+if you want to create the user and dont want to take the user inputs we can use the useradd.
+it is more useful for when we write the shell scripts.
+
+
+3) can we restore the user password ?
+no we cant restore the password of the user at any cost. because it is highly encrypted.
+
+
+
+how to set expiry for the password : chage -M 90 username
+
+how to lock the user account   : passwd -l username 
+
+how to unlock the user account : passwd -u username 
+
+
+GROUPS :
+for example i have the 500 users in the company 250 is dev and 200 QE 30 devOps and 30 management 
+one fine day you are a Linux admin they are asked to change the particular file permissions for the 250 developers.
+remove the /sbin folder access to that 250 dev 
+
+so to avoid that situation we have to create the groups like dev , QE , devops , management 
+we will put the all 250 dev in dev group.
+then we can modify the permissions for the group.
+
+how to create the group : groupadd devops 
+how to check     : cat /etc/group
+how to add user to group : usermod -aG devops pavan 
+
+
+how to login to ec2 server in local machine :
+for windows got to git bash and run ssh username@public_ipadress
+enter password 
+now you are in that server.
+
+
+how to see cloud provider password authentication
+
+cat /etc/ssh/sshd_config.d/60-cloudimg-settings.conf
+PasswordAuthentication no
+
+systemclt restart ssh
