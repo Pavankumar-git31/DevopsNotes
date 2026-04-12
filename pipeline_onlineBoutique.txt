@@ -1,0 +1,93 @@
+docker system prune -a -f
+
+docker container prune -f
+docker image prune -a -f
+docker volume prune -f
+
+
+
+
+pipeline{
+    agent any
+    environment {
+        DOCKER_VERSION = "v1"
+        DOCKER_USER="pavankumarkothala31"
+        NAMESPACE="boutique"
+    }
+    stages{
+        stage('checkout'){
+            steps{
+                git branch: 'main' , url: 'https://github.com/Pavankumar-git31/microservices-demo.git'
+            }
+        }
+        
+        stage('docker build')
+        {
+            steps{
+                script{
+                    echo 'Building Docker images for all services...'
+                    def services = [
+                        'emailservice',
+                        'recommendationservice',
+                        'paymentservice',
+                        'currencyservice',
+                        'productcatalogservice',
+                        'shippingservice',
+                        'checkoutservice',
+                        'frontend',
+                        'adservice'
+                    ]
+                    
+                    for (service in services){
+                        def imageName = service.split('/').last()  // ← ONLY change
+                        echo "building ${imageName}"
+                        sh """
+                         docker build -t ${DOCKER_USER}/${imageName}:${DOCKER_VERSION} ./src/${service}/
+                        """
+                        
+                        echo "build completed for ${imageName}"
+                    }
+                }
+            }
+        }
+        
+        stage('cartservice build')
+        {
+            steps{
+                 sh """
+                 docker build -t ${DOCKER_USER}/cartservice:${DOCKER_VERSION} ./src/cartservice/src/
+                 """
+            }
+           
+        }
+        
+        stage('docker push')
+        {
+            steps{
+                script{
+                    echo "pushing images"
+                    def services = [
+                        'emailservice',
+                        'recommendationservice',
+                        'paymentservice',
+                        'currencyservice',
+                        'productcatalogservice',
+                        'shippingservice',
+                        'checkoutservice',
+                        'frontend',
+                        'cartservice',
+                        'adservice'
+                    ]
+                    
+                    for (service in services){
+                       sh """
+                       docker push ${DOCKER_USER}/${service}:${DOCKER_VERSION}
+                       """
+                    }
+                }
+            }
+        }
+        
+        
+    }
+}
